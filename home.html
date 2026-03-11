@@ -1997,11 +1997,10 @@
                 </div>
             </div>
         </div>
-
-        <video class="hero-video" autoplay muted loop playsinline>
-            <source src="https://res.cloudinary.com/dsj71trpl/video/upload/v1773261849/anime-bg_qoca9i.mp4" type="video/mp4">
-        </video>
-
+<video id="bgVideo" width="100%" autoplay muted loop></video>
+<script>
+  document.getElementById('bgVideo').src = "https://res.cloudinary.com/dsj71trpl/video/upload/v1773261849/anime-bg_qoca9i.mp4";
+</script>
         <div class="hero-overlay"></div>
 
         <h1>Find the Best Tutor for Your Future</h1>
@@ -3355,5 +3354,6 @@
         }
     </script>
 </body>
+
 
 </html>
