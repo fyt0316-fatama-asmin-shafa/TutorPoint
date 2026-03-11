@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to TuTorPoint - Safety First</title>
+    <style>
+        body {
+            background: url('abcd.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex; 
+            justify-content: center; /*card ta majhe thakar jonno*/
+            align-items: center; /*card er size tar upore niche balance thakar jonno*/
+            height: 100vh; 
+        }
+
+        .safety-box { 
+           background: linear-gradient(
+        180deg,
+        #df5aaa,
+        #ae4373,
+        #b3558a
+    );
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(4, 17, 253, 0.4); 
+            max-width: 520px; 
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(240, 11, 11, 0.3);
+        }
+.logo-container {
+    display: flex;
+    height: 22vh;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Circle SVG animation */
+.circle-svg circle {
+    stroke-dasharray: 440; /* circumference ≈ 2πr */
+    stroke-dashoffset: 440;
+    animation: drawCircle 2s linear forwards;
+}
+
+/* Circle disappears after drawing */
+.circle-svg {
+    animation: hideCircle 0.5s forwards 2s;
+}
+
+@keyframes drawCircle {
+    0% { stroke-dashoffset: 440; }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes hideCircle {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Logo appears after circle animation */
+.logo-img {
+    width: 200px;
+    height: auto;
+    opacity: 0;
+    position: absolute;
+    animation: logoAppear 0.8s ease forwards 2s, floatLogo 3s ease-in-out infinite 2.8s;
+}
+/* Fade-in and scale for logo */
+@keyframes logoAppear {
+    0% { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Gentle floating animation for logo */
+@keyframes floatLogo {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+        h2 { 
+            color: #070707; 
+            font-size: 1.5rem; 
+        }
+
+        .rules-list { 
+            text-align: left; 
+            background:  #b0608e; 
+            padding: 10px; 
+            border-radius: 12px; 
+        }
+
+        .rules-list li { 
+            margin-bottom: 12px; 
+            color: rgb(8, 6, 6); 
+            font-size: 0.95rem; 
+            list-style: none;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .rules-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #06ed66;
+            font-weight: bold;
+        }
+
+        .btn-group { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            margin-top: 30px; 
+        }
+
+        .btn { 
+            padding: 14px 35px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: all 0.3s ease; 
+            text-decoration: none;
+            font-size: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-agree { 
+            background: #081e80; 
+            color: #f5f0f0;
+        }
+
+        .btn-agree:hover { 
+            background: #605c9e; 
+        }
+
+        .btn-disagree { 
+            background: #9c0308; 
+            color: hsl(20, 27%, 98%);
+        }
+
+        .btn-disagree:hover { 
+            background: #ee5f5f; 
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="safety-box">
+
+    <!-- TuTorPoint Logo -->
+   <div class="logo-container">
+    <!-- Spinning circle (SVG) -->
+    <svg class="circle-svg" width="150" height="150" viewBox="0 0 150 150">
+        <circle cx="75" cy="75" r="70" stroke="white" stroke-width="2" fill="none" />
+    </svg>
+
+    <!-- Logo -->
+    <img src="logo.png" alt="TuTorPoint Logo" class="logo-img">
+</div>
+
+    <h2>Software Safety & Guidelines</h2>
+    <p style="color: #0b0808;">Please read and agree to the safety terms to continue.</p>
+
+    <ul class="rules-list">
+        <li>Minimum of 10 classes must be completed.</li>
+        <li>All payments must be processed through the system.</li>
+        <li>Tutors must provide valid National ID and real information.</li>
+        <li>Guardian information is required for student safety.</li>
+        <li>Any inappropriate behavior will result in permanent account suspension.</li>
+        <li>All transactions between tutors and students must remain transparent.</li>
+    </ul>
+
+    <div class="btn-group">
+        <a href="home.html" class="btn btn-agree">I AGREE</a>
+        <button onclick="goBack()" class="btn btn-disagree">DISAGREE</button>
+    </div>
+
+</div>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+</body>
+</html>

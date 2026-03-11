@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - TutorPoint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Create Account page styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: #fde7f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .reg-container {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(193, 53, 132, 0.15);
+        }
+
+        .header h2 {
+            color: #8e164d;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .profile-upload-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .upload-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px dashed #c13584;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            background: #f9f9f9;
+        }
+
+        .upload-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .upload-circle i {
+            font-size: 40px;
+            color: #c13584;
+            line-height: 120px;
+        }
+
+        .optional-badge {
+            font-size: 12px;
+            color: #666;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #c13584;
+            box-shadow: 0 0 5px rgba(193, 53, 132, 0.2);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .submit-btn {
+            flex: 2;
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(193, 53, 132, 0.3);
+        }
+
+        .back-btn {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 25px;
+            background: #eee;
+            color: #333;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #ddd;
+        }
+
+        .role-info {
+            font-size: 12px;
+            color: #c13584;
+            margin-top: 5px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .phone-input-container {
+            position: relative;
+        }
+
+        .bd-flag {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
+        #phone {
+            padding-left: 45px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reg-container">
+        <div class="header">
+            <h2>Create Account</h2>
+            <p>আপনার তথ্য দিয়ে অ্যাকাউন্ট তৈরি করুন | Create your account</p>
+        </div>
+
+        <div class="profile-upload-section">
+            <div class="upload-circle" onclick="document.getElementById('imageInput').click()">
+                <i class="fas fa-camera" id="cameraIcon"></i>
+                <img id="imagePreview" src="" alt="Preview">
+            </div>
+            <input type="file" id="imageInput" hidden accept="image/*">
+            <p style="font-size: 12px; color: #c13584; margin-top: 5px;">
+                <i class="fas fa-cloud-upload-alt"></i> Upload Profile Picture <span style="color:#666;" class="optional-badge">(Optional)</span>
+            </p>
+        </div>
+
+        <form id="createAccountForm">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name *</label>
+                <input type="text" id="fullName" placeholder="e.g. Fatema Yasmin" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Phone Number *</label>
+                    <div class="phone-input-container">
+                        <input type="tel" id="regPhone" placeholder="017XXXXXXXX" required pattern="01[3-9][0-9]{8}" title="Please enter a valid Bangladeshi phone number (11 digits starting with 01)">
+                    </div>
+                    <small class="phone-hint">Example: 01712345678 (11 digits)</small>
+                    <div class="error-message" id="phoneError">Please enter a valid Bangladeshi phone number (11 digits starting with 01)</div>
+                </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email *</label>
+                <input type="email" id="email" placeholder="example@mail.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-user-tag"></i> Role *</label>
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="student">Student (ছাত্র/ছাত্রী)</option>
+                    <option value="guardian">Guardian (অভিভাবক)</option>
+                    <option value="others">Others (অন্যান্য)</option>
+                </select>
+                <p class="role-info">Note: Only Tutors will appear in Find Tutors page</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Password *</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+
+            <div class="btn-container">
+                <a href="home.html" class="back-btn">Back</a>
+                <button type="submit" class="submit-btn">Create Account</button>
+            </div>
+        </form>
+    </div>
+    
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+            authDomain: "medialert-a04d5.firebaseapp.com",
+            projectId: "medialert-a04d5",
+            storageBucket: "medialert-a04d5.firebasestorage.app",
+            messagingSenderId: "267657249954",
+            appId: "1:267657249954:web:01165929839cb83e7e03fb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let base64Image = "";
+        let isImageUploaded = false;
+
+        // Default profile image
+        const DEFAULT_PROFILE_IMG = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
+        // Phone number validation function for Bangladesh
+        function validateBangladeshPhone(phone) {
+            // Remove any non-digit characters
+            const cleaned = phone.replace(/\D/g, '');
+            
+            // Check if it's a valid Bangladeshi number
+            // Valid formats: 01XXXXXXXXX (11 digits starting with 01)
+            const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
+            return bdPhoneRegex.test(cleaned);
+        }
+
+        // Format phone number (remove non-digits)
+        function formatPhoneNumber(phone) {
+            return phone.replace(/\D/g, '');
+        }
+
+        // Image upload & preview
+        document.getElementById('imageInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    document.getElementById('imagePreview').src = evt.target.result;
+                    document.getElementById('imagePreview').style.display = "block";
+                    document.getElementById('cameraIcon').style.display = "none";
+                    base64Image = evt.target.result;
+                    isImageUploaded = true;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Real-time phone number validation
+        const phoneInput = document.getElementById('phone');
+        const phoneError = document.getElementById('phoneError');
+
+        phoneInput.addEventListener('input', function() {
+            const phone = this.value;
+            if (phone.length > 0) {
+                if (!validateBangladeshPhone(phone)) {
+                    this.style.borderColor = '#dc3545';
+                    phoneError.style.display = 'block';
+                } else {
+                    this.style.borderColor = '#28a745';
+                    phoneError.style.display = 'none';
+                }
+            } else {
+                this.style.borderColor = '#ddd';
+                phoneError.style.display = 'none';
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get phone number and validate
+            const phoneNumber = document.getElementById('phone').value;
+            
+            if (!validateBangladeshPhone(phoneNumber)) {
+                alert("❌ দয়া করে একটি বৈধ বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)");
+                document.getElementById('phone').focus();
+                return;
+            }
+
+            // Format phone number
+            const formattedPhone = formatPhoneNumber(phoneNumber);
+
+            // Photo is now OPTIONAL
+            const profilePicture = isImageUploaded ? base64Image : DEFAULT_PROFILE_IMG;
+
+            const userData = {
+                name: document.getElementById('fullName').value,
+                phone: formattedPhone, // Save formatted phone number
+                email: document.getElementById('email').value,
+                role: document.getElementById('role').value,
+                password: document.getElementById('password').value,
+                profilePic: profilePicture,
+                hasCustomPhoto: isImageUploaded,
+                createdAt: new Date().toISOString(),
+                userType: 'user',
+                country: 'Bangladesh',
+                phoneCountry: 'BD'
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "users"), userData);
+
+                localStorage.clear();
+                
+                localStorage.setItem("userDocId", docRef.id);
+                localStorage.setItem("userLoggedIn", "true");
+                localStorage.setItem("userType", "user");
+                localStorage.setItem("userName", userData.name);
+                localStorage.setItem("userEmail", userData.email);
+                localStorage.setItem("userPhone", userData.phone);
+                localStorage.setItem("userRole", userData.role);
+                localStorage.setItem("userImg", userData.profilePic);
+
+                let message = isImageUploaded 
+                    ? "Account created successfully!" 
+                    : "Account created successfully! You can upload a profile picture later.";
+                
+                alert(message);
+                window.location.href = "home.html";
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

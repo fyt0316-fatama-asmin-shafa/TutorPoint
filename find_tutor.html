@@ -1,0 +1,985 @@
+<!-- ========== FIND_TUTOR.HTML (আপডেটেড - সরলীকৃত কন্টাক্ট ফর্ম) ========== -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Tutor - TutorPoint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Existing styles from your original find_tutor.html */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fde7f3;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .search-container {
+            background: white;
+            padding: 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            box-shadow: 0 5px 20px rgba(193, 53, 132, 0.15);
+            border: 1px solid #f0c0d5;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-container input::placeholder {
+            color: #c13584;
+            opacity: 0.7;
+        }
+
+        .search-container button {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .search-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(193, 53, 132, 0.4);
+        }
+
+        .filter-info {
+            background: white;
+            border-radius: 30px;
+            padding: 15px 25px;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(193, 53, 132, 0.1);
+            border: 1px solid #fad1e4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-info span {
+            color: #8e164d;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .filter-info .subject-name {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+
+        .clear-filter {
+            background: #eee;
+            color: #666;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .clear-filter:hover {
+            background: #c13584;
+            color: white;
+        }
+
+        .tutor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tutor-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(193, 53, 132, 0.1);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .tutor-card:hover {
+            transform: translateY(-8px);
+            border-bottom: 3px solid #c13584;
+            box-shadow: 0 15px 30px rgba(193, 53, 132, 0.2);
+        }
+
+        .tutor-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+            border: 4px solid #fde7f3;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tutor-card h3 {
+            color: #983260;
+            margin: 8px 0 5px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .tutor-rating {
+            color: #ffc107;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .tutor-rating span {
+            color: #666;
+            font-size: 12px;
+            margin-left: 3px;
+        }
+
+        .tutor-card p {
+            font-size: 13px;
+            color: #555;
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-transform: capitalize;
+        }
+
+        .tutor-card i {
+            color: #c13584;
+            font-size: 13px;
+            width: 18px;
+        }
+
+        .tutor-badge {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 5px 0;
+            display: inline-block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .view-profile-btn {
+            flex: 1;
+            padding: 8px 5px;
+            background: linear-gradient(135deg, #6c5ce7, #a363d9);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+            box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .contact-teacher-btn {
+            flex: 1;
+            padding: 8px 5px;
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+            box-shadow: 0 3px 10px rgba(193, 53, 132, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .contact-teacher-btn:hover, .view-profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Contact Modal Styles - সরলীকৃত */
+        .contact-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .contact-modal-box {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 30px;
+            padding: 30px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 40px rgba(193, 53, 132, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .contact-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #fde7f3;
+            padding-bottom: 15px;
+        }
+
+        .contact-modal-header h3 {
+            color: #8e164d;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #c13584;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.2);
+            color: #8e164d;
+        }
+
+        .tutor-info-badge {
+            background: linear-gradient(135deg, #fde7f3, #fff0f8);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tutor-info-badge img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #c13584;
+        }
+
+        .tutor-info-badge div h4 {
+            color: #8e164d;
+            margin: 0 0 5px;
+            font-size: 16px;
+        }
+
+        .tutor-info-badge div p {
+            color: #666;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            color: #c13584;
+            margin-right: 8px;
+            width: 18px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #fad1e4;
+            border-radius: 15px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
+            background: #fff9fc;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #c13584;
+            box-shadow: 0 0 0 3px rgba(193, 53, 132, 0.1);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .submit-request-btn {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-request-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(193, 53, 132, 0.3);
+        }
+
+        .login-prompt {
+            background: #fde7f3;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-prompt p {
+            color: #8e164d;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .login-prompt a {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #c13584;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .back-home i {
+            margin-right: 5px;
+        }
+
+        .tutor-details-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .tutor-details-box {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .tutor-details-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #fde7f3;
+            padding-bottom: 15px;
+        }
+
+        .tutor-details-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #c13584;
+        }
+
+        .tutor-details-info h3 {
+            color: #8e164d;
+            font-size: 22px;
+            margin-bottom: 5px;
+            text-transform: capitalize;
+        }
+
+        .tutor-details-info p {
+            font-size: 14px;
+            color: #666;
+            margin: 3px 0;
+            text-transform: capitalize;
+        }
+
+        .tutor-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .tutor-details-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .tutor-details-item strong {
+            color: #c13584;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .tutor-details-item p {
+            color: #333;
+            font-size: 13px;
+            text-transform: capitalize;
+        }
+
+        .close-details-btn {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .info-note {
+            background: #e8f4fd;
+            color: #0a5d8c;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="home.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+    <div id="filterInfo" class="filter-info" style="display: none;">
+        <span>🔍 Showing tutors for:</span>
+        <span class="subject-name" id="currentSubject"></span>
+        <button class="clear-filter" onclick="clearSubjectFilter()">✕ Clear Filter</button>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 Search by Subject or Area (e.g. Math, Physics, Dhaka, Mirpur)" onkeyup="filterTutors()">
+        <button onclick="filterTutors()"><i class="fas fa-search"></i> Search</button>
+    </div>
+
+    <div id="tutorList" class="tutor-grid">
+        <p id="statusMsg">Loading Tutors...</p>
+    </div>
+
+    <!-- Tutor Details Modal -->
+    <div class="tutor-details-modal" id="tutorDetailsModal">
+        <div class="tutor-details-box">
+            <div id="tutorDetailsContent"></div>
+            <button class="close-details-btn" onclick="closeTutorDetails()">Close</button>
+        </div>
+    </div>
+
+    <!-- Contact Teacher Modal - সরলীকৃত -->
+    <div class="contact-modal" id="contactModal">
+        <div class="contact-modal-box">
+            <div class="contact-modal-header">
+                <h3><i class="fas fa-envelope"></i> Contact Teacher</h3>
+                <button class="close-modal" onclick="closeContactModal()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div id="contactTutorInfo" class="tutor-info-badge"></div>
+            
+            <div id="loginPrompt" class="login-prompt" style="display: none;">
+                <p><i class="fas fa-exclamation-triangle"></i> Please login to contact teacher</p>
+                <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login Now</a>
+            </div>
+            
+            <form id="contactForm" style="display: none;">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i> Fill out the form below. Admin will contact you soon.
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-user-graduate"></i> Student Name *</label>
+                    <input type="text" id="studentName" placeholder="e.g. Rahim Ahmed" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Area/Location *</label>
+                    <input type="text" id="area" placeholder="e.g. Mirpur, Dhaka" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone-alt"></i> Phone Number *</label>
+                    <input type="tel" id="contactPhone" placeholder="017XXXXXXXX" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note"></i> Details (Class, Subjects, Requirements) *</label>
+                    <textarea id="details" placeholder="Example: Class 8 student, needs help with Math and Physics. Looking for 3 days per week. Budget 3000-4000 tk." required></textarea>
+                </div>
+                
+                <button type="submit" class="submit-request-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+            authDomain: "medialert-a04d5.firebaseapp.com",
+            projectId: "medialert-a04d5",
+            storageBucket: "medialert-a04d5.firebasestorage.app",
+            messagingSenderId: "267657249954",
+            appId: "1:267657249954:web:01165929839cb83e7e03fb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let allTutors = [];
+        let allTutorDocs = [];
+        let currentSubject = null;
+        let selectedTutor = null;
+
+        // Check login status
+        const isLoggedIn = localStorage.getItem("userLoggedIn") === "true";
+        const userType = localStorage.getItem("userType");
+        const userDocId = localStorage.getItem("userDocId");
+        const userName = localStorage.getItem("userName");
+
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            let starsHtml = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else if (i === fullStars + 1 && hasHalfStar) {
+                    starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star"></i>';
+                }
+            }
+            return starsHtml;
+        }
+
+        function getSubjectFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('subject');
+        }
+
+        async function loadTutors() {
+            try {
+                const q = query(collection(db, "tutors"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                allTutors = [];
+                allTutorDocs = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const tutorData = doc.data();
+                    allTutors.push(tutorData);
+                    allTutorDocs.push({ id: doc.id, data: tutorData });
+                });
+                
+                const subjectFromUrl = getSubjectFromUrl();
+                if (subjectFromUrl) {
+                    const decodedSubject = decodeURIComponent(subjectFromUrl).toLowerCase().trim();
+                    currentSubject = decodedSubject;
+                    
+                    const filterInfo = document.getElementById('filterInfo');
+                    const currentSubjectSpan = document.getElementById('currentSubject');
+                    filterInfo.style.display = 'flex';
+                    currentSubjectSpan.textContent = subjectFromUrl;
+                    
+                    filterTutorsBySubject(decodedSubject);
+                } else {
+                    document.getElementById('filterInfo').style.display = 'none';
+                    displayTutors(allTutors);
+                }
+                
+            } catch (error) {
+                console.error("Error loading tutors: ", error);
+                document.getElementById("statusMsg").innerText = "Error loading data! Please try again.";
+            }
+        }
+
+        function filterTutorsBySubject(subject) {
+            const filtered = allTutors.filter(tutor => {
+                if (!tutor.subject) return false;
+                
+                const tutorSubjects = tutor.subject.toLowerCase().split(',').map(s => s.trim());
+                
+                return tutorSubjects.some(s => 
+                    s.includes(subject) || subject.includes(s)
+                );
+            });
+            
+            displayTutors(filtered);
+            
+            if (filtered.length === 0) {
+                document.getElementById("statusMsg").innerText = `কোনো "${document.getElementById('currentSubject').textContent}" বিষয়ের টিউটর পাওয়া যায়নি!`;
+            }
+        }
+
+        window.clearSubjectFilter = function() {
+            currentSubject = null;
+            document.getElementById('filterInfo').style.display = 'none';
+            
+            const url = new URL(window.location);
+            url.searchParams.delete('subject');
+            window.history.pushState({}, '', url);
+            
+            displayTutors(allTutors);
+            document.getElementById("searchInput").value = '';
+        };
+
+        function displayTutors(tutorArray) {
+            const container = document.getElementById("tutorList");
+            container.innerHTML = "";
+
+            if (tutorArray.length === 0) {
+                container.innerHTML = `<p id="statusMsg">কোনো টিউটর পাওয়া যায়নি! | No tutors found!</p>`;
+                return;
+            }
+
+            tutorArray.forEach((tutor) => {
+                const tutorDoc = allTutorDocs.find(doc => 
+                    doc.data.email === tutor.email
+                );
+                const tutorId = tutorDoc ? tutorDoc.id : '';
+                
+                const profileImg = tutor.profilePic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+                const ratingNum = tutor.averageRating || 4.5;
+                const rating = ratingNum.toFixed(1);
+                const reviewCount = tutor.reviewCount || Math.floor(Math.random() * 20) + 5;
+                
+                let subjects = tutor.subject || 'N/A';
+                if (subjects.includes(',')) {
+                    subjects = subjects.split(',')[0].trim();
+                }
+                
+                let area = tutor.area || 'N/A';
+                if (area.includes(',')) {
+                    area = area.split(',')[0].trim();
+                }
+                
+                let qualification = tutor.qualification || 'N/A';
+                if (qualification.includes(',')) {
+                    qualification = qualification.split(',')[0].trim();
+                }
+                
+                let name = tutor.name || 'N/A';
+                if (name.includes(' ')) {
+                    name = name.split(' ')[0];
+                }
+                
+                const card = document.createElement("div");
+                card.className = "tutor-card";
+                card.onclick = () => showTutorDetails(tutorId);
+                
+                card.innerHTML = `
+                    <img src="${profileImg}" class="tutor-img" alt="Profile">
+                    <div class="tutor-badge">⭐ ${rating}</div>
+                    <h3>${name}</h3>
+                    <div class="tutor-rating">
+                        ${getStarRating(ratingNum)}
+                        <span>(${reviewCount})</span>
+                    </div>
+                    <p><i class="fas fa-book"></i> ${subjects}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${area}</p>
+                    <p><i class="fas fa-graduation-cap"></i> ${qualification}</p>
+                    <div class="button-group">
+                        <button class="view-profile-btn" onclick="event.stopPropagation(); showTutorDetails('${tutorId}')">
+                            <i class="fas fa-user-graduate"></i> Profile
+                        </button>
+                        <button class="contact-teacher-btn" onclick="event.stopPropagation(); openContactModal('${tutorId}', '${name}', '${profileImg}')">
+                            <i class="fas fa-envelope"></i> Contact
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Show tutor details
+        window.showTutorDetails = async function(tutorId) {
+            if (!tutorId) return;
+            
+            try {
+                const tutorRef = doc(db, "tutors", tutorId);
+                const tutorDoc = await getDoc(tutorRef);
+                
+                if (tutorDoc.exists()) {
+                    const tutor = tutorDoc.data();
+                    const content = document.getElementById("tutorDetailsContent");
+                    
+                    const ratingNum = tutor.averageRating || 4.5;
+                    const rating = ratingNum.toFixed(1);
+                    const reviewCount = tutor.reviewCount || Math.floor(Math.random() * 20) + 5;
+                    
+                    content.innerHTML = `
+                        <div class="tutor-details-header">
+                            <img src="${tutor.profilePic || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" class="tutor-details-img">
+                            <div class="tutor-details-info">
+                                <h3>${tutor.name || 'N/A'}</h3>
+                                <p><i class="fas fa-star" style="color:#ffc107"></i> ${rating} (${reviewCount} reviews)</p>
+                                <p><i class="fas fa-id-card"></i> ID: TS-${tutorId.slice(-5)}</p>
+                                <p><i class="fas fa-venus-mars"></i> ${tutor.gender || 'Male'}</p>
+                            </div>
+                        </div>
+                        <div class="tutor-details-grid">
+                            <div class="tutor-details-item"><strong>📚 Qualification</strong><p>${tutor.qualification || 'N/A'}</p></div>
+                            <div class="tutor-details-item"><strong>📍 Location</strong><p>${tutor.area || 'N/A'}</p></div>
+                            <div class="tutor-details-item"><strong>💰 Salary</strong><p>${tutor.salary || 'Negotiable'} TK</p></div>
+                            <div class="tutor-details-item"><strong>💼 Experience</strong><p>${tutor.experience || '0'} years</p></div>
+                            <div class="tutor-details-item"><strong>📖 Subjects</strong><p>${tutor.subject || 'N/A'}</p></div>
+                            <div class="tutor-details-item"><strong>⏰ Time</strong><p>${tutor.preferredTime || 'Flexible'}</p></div>
+                            <div class="tutor-details-item"><strong>✉️ Email</strong><p>${tutor.email || 'N/A'}</p></div>
+                        </div>
+                        <div class="tutor-details-item" style="margin-top:15px">
+                            <strong>📝 About</strong>
+                            <p>${tutor.about || 'Experienced tutor dedicated to helping students achieve their academic goals.'}</p>
+                        </div>
+                    `;
+                    
+                    document.getElementById("tutorDetailsModal").style.display = "flex";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+
+        window.closeTutorDetails = () => {
+            document.getElementById("tutorDetailsModal").style.display = "none";
+        };
+
+        window.filterTutors = function() {
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+            
+            let baseArray = currentSubject ? allTutors.filter(tutor => {
+                const tutorSubjects = tutor.subject?.toLowerCase().split(',').map(s => s.trim()) || [];
+                return tutorSubjects.some(s => s.includes(currentSubject) || currentSubject.includes(s));
+            }) : allTutors;
+            
+            if (!searchTerm) {
+                displayTutors(baseArray);
+                return;
+            }
+
+            const filtered = baseArray.filter(tutor => {
+                const subjectMatch = tutor.subject && tutor.subject.toLowerCase().includes(searchTerm);
+                const areaMatch = tutor.area && tutor.area.toLowerCase().includes(searchTerm);
+                const nameMatch = tutor.name && tutor.name.toLowerCase().includes(searchTerm);
+                
+                return subjectMatch || areaMatch || nameMatch;
+            });
+
+            displayTutors(filtered);
+        };
+
+        // Open contact modal - সরলীকৃত
+        window.openContactModal = function(tutorId, tutorName, tutorImg) {
+            selectedTutor = { id: tutorId, name: tutorName, image: tutorImg };
+            
+            const contactModal = document.getElementById("contactModal");
+            const contactTutorInfo = document.getElementById("contactTutorInfo");
+            const loginPrompt = document.getElementById("loginPrompt");
+            const contactForm = document.getElementById("contactForm");
+            
+            // Show tutor info
+            contactTutorInfo.innerHTML = `
+                <img src="${tutorImg}" alt="${tutorName}">
+                <div>
+                    <h4><i class="fas fa-chalkboard-teacher"></i> ${tutorName}</h4>
+                    <p>You are contacting this teacher</p>
+                </div>
+            `;
+            
+            // Check login status
+            if (!isLoggedIn) {
+                loginPrompt.style.display = "block";
+                contactForm.style.display = "none";
+            } else {
+                loginPrompt.style.display = "none";
+                contactForm.style.display = "block";
+                
+                // Pre-fill user data if available
+                const userPhone = localStorage.getItem("userPhone") || "";
+                document.getElementById("contactPhone").value = userPhone;
+                
+                // Pre-fill student name if available
+                if (userName) {
+                    document.getElementById("studentName").value = userName;
+                }
+            }
+            
+            contactModal.style.display = "flex";
+        };
+
+        window.closeContactModal = function() {
+            document.getElementById("contactModal").style.display = "none";
+            document.getElementById("contactForm").reset();
+        };
+
+        // Handle form submission - আপডেটেড
+        document.getElementById("contactForm")?.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            if (!selectedTutor || !userDocId) {
+                alert("Something went wrong. Please try again.");
+                return;
+            }
+            
+            const requestData = {
+                tutorId: selectedTutor.id,
+                tutorName: selectedTutor.name,
+                studentName: document.getElementById("studentName").value,
+                area: document.getElementById("area").value,
+                phone: document.getElementById("contactPhone").value,
+                details: document.getElementById("details").value,
+                status: "pending",
+                userId: userDocId,
+                userType: localStorage.getItem("userType") || "user",
+                userName: localStorage.getItem("userName") || "Unknown",
+                createdAt: serverTimestamp()
+            };
+            
+            try {
+                const submitBtn = e.target.querySelector("button[type='submit']");
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                submitBtn.disabled = true;
+                
+                await addDoc(collection(db, "teacherContactRequests"), requestData);
+                
+                alert("✅ Request sent successfully! Admin will contact you soon.");
+                closeContactModal();
+                
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+            } catch (error) {
+                console.error("Error submitting request:", error);
+                alert("❌ Error submitting request. Please try again.");
+                
+                const submitBtn = e.target.querySelector("button[type='submit']");
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
+                submitBtn.disabled = false;
+            }
+        });
+
+        window.onload = loadTutors;
+
+        window.onclick = (event) => {
+            const tutorModal = document.getElementById("tutorDetailsModal");
+            const contactModal = document.getElementById("contactModal");
+            
+            if (event.target === tutorModal) {
+                tutorModal.style.display = "none";
+            }
+            if (event.target === contactModal) {
+                contactModal.style.display = "none";
+            }
+        };
+        
+    </script>
+</body>
+
+</html>

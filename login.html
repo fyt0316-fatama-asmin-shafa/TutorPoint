@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TutorPoint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Login page styles */
+        body {
+            background: linear-gradient(135deg, #fde7f3 0%, #fff0f8 100%);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(193, 53, 132, 0.2);
+        }
+
+        h2 {
+            color: #8e164d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #c13584;
+            box-shadow: 0 0 5px rgba(193, 53, 132, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(193, 53, 132, 0.3);
+        }
+
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer-links a {
+            color: #c13584;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-img {
+            width: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <div class="logo-container">
+            <img src="logo.png" alt="TutorPoint" class="logo-img">
+        </div>
+        
+        <h2>Login</h2>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="loginEmail" placeholder="example@email.com" required>
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="loginPass" placeholder="******" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        
+        <div class="footer-links">
+            <a href="forgot_pass.html">Forgot Password?</a> <br><br>
+            Don't have an account? <a href="create_account.html">Register as Student</a><br>
+            Want to teach? <a href="become_tutor.html">Become a Tutor</a>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+            authDomain: "medialert-a04d5.firebaseapp.com",
+            projectId: "medialert-a04d5",
+            storageBucket: "medialert-a04d5.firebasestorage.app",
+            messagingSenderId: "267657249954",
+            appId: "1:267657249954:web:01165929839cb83e7e03fb"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPass').value;
+
+            // Basic validation
+            if (!email || !password) {
+                alert("Please enter both email and password");
+                return;
+            }
+
+            try {
+                // First check in tutors collection
+                const tutorsRef = collection(db, "tutors");
+                const tutorQuery = query(tutorsRef, where("email", "==", email), where("password", "==", password));
+                const tutorSnapshot = await getDocs(tutorQuery);
+                
+                if (!tutorSnapshot.empty) {
+                    // Tutor found
+                    let userData;
+                    let docId;
+                    tutorSnapshot.forEach((doc) => {
+                        userData = doc.data();
+                        docId = doc.id;
+                    });
+
+                    // Save to localStorage
+                    localStorage.setItem("userDocId", docId);
+                    localStorage.setItem("userLoggedIn", "true");
+                    localStorage.setItem("userType", "tutor");
+                    localStorage.setItem("userName", userData.name || "Tutor");
+                    localStorage.setItem("userEmail", userData.email);
+                    localStorage.setItem("userPhone", userData.phone || "");
+                    localStorage.setItem("userImg", userData.profilePic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
+                    localStorage.setItem("userEdu", userData.qualification || "");
+                    localStorage.setItem("userSubject", userData.subject || "");
+                    localStorage.setItem("userArea", userData.area || "");
+                    localStorage.setItem("userExperience", userData.experience || "");
+                    localStorage.setItem("userSalary", userData.salary || "");
+                    localStorage.setItem("userClass", userData.preferredClass || "");
+                    localStorage.setItem("userRole", "tutor");
+
+                    alert("Login successful! (Tutor)");
+                    window.location.href = "home.html";
+                    return;
+                }
+
+                // If not found in tutors, check in users collection
+                const usersRef = collection(db, "users");
+                const userQuery = query(usersRef, where("email", "==", email), where("password", "==", password));
+                const userSnapshot = await getDocs(userQuery);
+                
+                if (!userSnapshot.empty) {
+                    // User found
+                    let userData;
+                    let docId;
+                    userSnapshot.forEach((doc) => {
+                        userData = doc.data();
+                        docId = doc.id;
+                    });
+
+                    // Save to localStorage
+                    localStorage.setItem("userDocId", docId);
+                    localStorage.setItem("userLoggedIn", "true");
+                    localStorage.setItem("userType", "user");
+                    localStorage.setItem("userName", userData.name || "User");
+                    localStorage.setItem("userEmail", userData.email);
+                    localStorage.setItem("userPhone", userData.phone || "");
+                    localStorage.setItem("userImg", userData.profilePic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
+                    localStorage.setItem("userRole", userData.role || "student");
+
+                    alert("Login successful! (" + (userData.role || "User") + ")");
+                    window.location.href = "home.html";
+                } else {
+                    alert("Invalid email or password! Please try again.");
+                }
+                
+            } catch (error) {
+                console.error("Error logging in: ", error);
+                alert("Login failed: " + error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

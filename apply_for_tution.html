@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuition Apply</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+background: linear-gradient(180deg, #fde7f3 0%, #fff0f8 100%);
+font-family:system-ui;
+padding:2rem;
+display:flex;
+justify-content:center;
+}
+.container{max-width:1300px;width:100%}
+
+.page-nav{
+display:flex;gap:1rem;
+margin-bottom:2rem;
+background:white;
+padding:0.8rem 1.5rem;
+border-radius:60px;
+}
+.page-btn{
+border:none;
+background:transparent;
+padding:0.6rem 2rem;
+border-radius:40px;
+cursor:pointer;
+font-weight:500;
+}
+.page-btn.active{background:#8e164d;color:white}
+
+.page{display:none}
+.active-page{display:block}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:1.5rem;
+}
+
+.card{
+background:white;padding:1.5rem;
+border-radius:20px;
+box-shadow:0 10px 20px rgba(0,0,0,0.20);
+display:flex;flex-direction:column;
+transition:0.3s;
+}
+.card:hover{transform:translateY(-5px)}
+
+.detail-row{
+display:flex;justify-content:space-between;
+margin-bottom:0.5rem;font-size:0.9rem;
+}
+.value{
+background:#f0f5fb;
+padding:0.2rem 0.8rem;
+border-radius:40px;
+}
+
+.salary{
+background:#e3f0ec;
+
+padding:0.2rem 1rem;
+border-radius:40px;
+}
+
+.apply-btn{
+margin-top:1rem;
+padding:0.7rem;
+border:none;border-radius:40px;
+background: linear-gradient(135deg, #ff5ca8, #c13584);
+color:white;
+cursor:pointer;
+}
+.apply-btn.applied{
+background:#d1acbd;
+cursor:not-allowed;
+}
+
+.popup{
+position:fixed;inset:0;
+background:rgba(0,0,0,0.5);
+display:flex;justify-content:center;align-items:center;
+visibility:hidden;opacity:0;transition:0.2s;
+
+}
+.popup.active{visibility:visible;opacity:1}
+
+.popup-card{
+background:white;padding:2rem;border-radius:25px;width:340px;
+}
+.popup-buttons{
+display:flex;gap:1rem;margin-top:1rem;
+}
+.popup-buttons button{
+flex:1;padding:0.6rem;border-radius:30px;border:none;cursor:pointer;
+}
+.confirm{background:#1f3449;color:white}
+.cancel{background:#eee}
+
+.applied-list{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:1.5rem;
+
+}
+
+.dashboard-card{
+background:white;padding:1.5rem;
+border-radius:20px;
+border-left:5px solid #56738f;
+}
+.remove-btn{
+margin-top:0.8rem;
+background:#fbe4e4;
+border:none;padding:5px 12px;
+border-radius:20px;cursor:pointer;
+}
+
+#search{
+margin-bottom:1.5rem;
+padding:0.7rem 1rem;
+border-radius:40px;
+border:1px solid #ccc;
+width:250px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<div class="page-nav">
+<button class="page-btn active" id="p1">Apply</button>
+<button class="page-btn" id="p2">Dashboard</button>
+</div>
+
+<div class="page active-page" id="page1">
+
+<input type="text" id="search" placeholder="Search by Class (6,7,8...)">
+
+<div class="grid" id="grid"></div>
+</div>
+
+<div class="page" id="page2">
+<div class="applied-list" id="dashboard"></div>
+
+</div>
+
+</div>
+
+<div class="popup" id="popup">
+<div class="popup-card">
+<h3>Confirm Application</h3>
+<div id="popupDetails"></div>
+<div class="popup-buttons">
+<button class="cancel" id="cancel">Cancel</button>
+<button class="confirm" id="confirm">Confirm</button>
+</div>
+</div>
+</div>
+
+<script type="module">
+// ========== FIREBASE IMPORTS ==========
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// ========== FIREBASE CONFIG ==========
+const firebaseConfig = {
+    apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+    authDomain: "medialert-a04d5.firebaseapp.com",
+    projectId: "medialert-a04d5",
+    storageBucket: "medialert-a04d5.firebasestorage.app",
+    messagingSenderId: "267657249954",
+    appId: "1:267657249954:web:01165929839cb83e7e03fb"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ========== GLOBAL VARIABLES ==========
+const isLoggedIn = localStorage.getItem("userLoggedIn") === "true";
+const userType = localStorage.getItem("userType");
+const userDocId = localStorage.getItem("userDocId");
+const userEmail = localStorage.getItem("userEmail");
+const userName = localStorage.getItem("userName");
+
+let applied = JSON.parse(localStorage.getItem("applied")) || [];
+let tuitionData = [];
+let currentIndex = null;
+
+// ========== SAMPLE DATA (IF FIRESTORE EMPTY) ==========
+const sampleData = [
+{
+id:"RMP-1001",
+classNum:"6",
+medium:"Bangla",
+location:"Rampura",
+subjects:["Math"]
+},
+{
+id:"UTR-1002",
+classNum:"8",
+medium:"English",
+location:"Uttara",
+subjects:["Math","English","Science"]
+},
+{
+id:"GLS-1003",
+classNum:"9",
+medium:"English",
+location:"Gulshan",
+subjects:["Physics","Chemistry"]
+},
+{
+id:"DHM-1004",
+classNum:"10",
+medium:"Bangla",
+location:"Dhanmondi",
+subjects:["Math","Higher Math","ICT","Physics"]
+},
+{
+id:"MRP-1005",
+classNum:"7",
+medium:"Bangla",
+location:"Mirpur",
+subjects:["English"]
+},
+{
+id:"BDD-1006",
+classNum:"6",
+medium:"English",
+location:"Badda",
+subjects:["Math","English"]
+},
+{
+id:"BAN-1007",
+classNum:"9",
+medium:"English",
+location:"Banani",
+subjects:["Physics","Chemistry","Biology"]
+},
+{
+id:"MHK-1008",
+classNum:"10",
+medium:"Bangla",
+location:"Mohakhali",
+subjects:["Math","ICT"]
+},
+{
+id:"WAR-1009",
+classNum:"8",
+medium:"Bangla",
+location:"Wari",
+subjects:["Math"]
+},
+{
+id:"MTJ-1010",
+classNum:"7",
+medium:"English",
+location:"Motijheel",
+subjects:["English","Math","Science"]
+}
+];
+
+// ========== LOAD TUITION POSTS ==========
+async function loadTuitionPosts() {
+    try {
+        const postsRef = collection(db, "tuitionPosts");
+        const q = query(postsRef, orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+        
+        if (!snapshot.empty) {
+            tuitionData = [];
+            snapshot.forEach(doc => {
+                tuitionData.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+        } else {
+            tuitionData = sampleData;
+        }
+        
+        // Load applications for this tutor
+        if (isLoggedIn && userType === "tutor") {
+            await loadApplications();
+        } else {
+            render();
+        }
+    } catch (error) {
+        console.error("Error loading posts:", error);
+        tuitionData = sampleData;
+        render();
+    }
+}
+
+// ========== LOAD APPLICATIONS FROM FIRESTORE ==========
+async function loadApplications() {
+    try {
+        const appsRef = collection(db, "applications");
+        const q = query(appsRef, where("tutorId", "==", userDocId));
+        const snapshot = await getDocs(q);
+        
+        // Clear localStorage applied array
+        applied = [];
+        
+        snapshot.forEach(doc => {
+            const app = doc.data();
+            // Find the index of this post in tuitionData
+            const postIndex = tuitionData.findIndex(post => post.id === app.postId);
+            if (postIndex !== -1) {
+                applied.push(postIndex);
+            }
+        });
+        
+        // Save to localStorage
+        localStorage.setItem("applied", JSON.stringify(applied));
+        
+        render();
+        renderDashboard();
+    } catch (error) {
+        console.error("Error loading applications:", error);
+        render();
+    }
+}
+
+// ========== CALCULATE SALARY ==========
+function calculateSalary(subjects) {
+    return subjects.length * 1000;
+}
+
+// ========== RENDER FUNCTION ==========
+function render() {
+    const grid = document.getElementById("grid");
+    
+    grid.innerHTML = tuitionData.map((item, index) => {
+        const isApplied = applied.includes(index);
+        const salary = item.salary || calculateSalary(item.subjects);
+        
+        // Check if user can apply
+        let canApply = false;
+        let buttonText = "Apply";
+        
+        if (isApplied) {
+            buttonText = "Applied";
+        } else if (!isLoggedIn) {
+            buttonText = "Login to Apply";
+        } else if (userType !== "tutor") {
+            buttonText = "Only Tutors Can Apply";
+        } else {
+            canApply = true;
+        }
+        
+        return `
+        <div class="card" data-index="${index}">
+            <div class="detail-row">
+                <span>ID</span>
+                <span class="value">${item.id}</span>
+            </div>
+            <div class="detail-row">
+                <span>Class</span>
+                <span class="value">${item.classNum}</span>
+            </div>
+            <div class="detail-row">
+                <span>Medium</span>
+                <span class="value">${item.medium}</span>
+            </div>
+            <div class="detail-row">
+                <span>Location</span>
+                <span class="value">${item.location}</span>
+            </div>
+            <div class="detail-row">
+                <span>Subjects</span>
+                <span class="value">${item.subjects.join(", ")}</span>
+            </div>
+            <div class="detail-row">
+                <span>Salary</span>
+                <span class="salary">৳ ${salary}</span>
+            </div>
+            <button class="apply-btn ${isApplied ? 'applied' : ''}" ${!canApply || isApplied ? 'disabled' : ''}>
+                ${buttonText}
+            </button>
+        </div>`;
+    }).join("");
+    
+    // Add click handlers to apply buttons
+    document.querySelectorAll(".apply-btn:not(.applied):not(:disabled)").forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            const card = btn.closest(".card");
+            if (card) {
+                currentIndex = card.dataset.index;
+                const item = tuitionData[currentIndex];
+                const salary = item.salary || calculateSalary(item.subjects);
+                
+                popupDetails.innerHTML = `
+                    <p><strong>ID:</strong> ${item.id}</p>
+                    <p><strong>Class:</strong> ${item.classNum}</p>
+                    <p><strong>Location:</strong> ${item.location}</p>
+                    <p><strong>Subjects:</strong> ${item.subjects.join(", ")}</p>
+                    <p><strong>Total Salary:</strong> ৳ ${salary}</p>`;
+                popup.classList.add("active");
+            }
+        };
+    });
+}
+
+// ========== RENDER DASHBOARD ==========
+function renderDashboard() {
+    const dashboard = document.getElementById("dashboard");
+    
+    if (applied.length === 0) {
+        dashboard.innerHTML = "";
+        return;
+    }
+    
+    dashboard.innerHTML = applied.map(index => {
+        const item = tuitionData[index];
+        if (!item) return '';
+        
+        const salary = item.salary || calculateSalary(item.subjects);
+        return `
+        <div class="dashboard-card">
+            <div><strong>ID:</strong> ${item.id}</div>
+            <div>Class: ${item.classNum}</div>
+            <div>Location: ${item.location}</div>
+            <div>Subjects: ${item.subjects.join(", ")}</div>
+            <div><strong>Salary: ৳ ${salary}</strong></div>
+            <button class="remove-btn" data-index="${index}">Remove</button>
+        </div>`;
+    }).join("");
+}
+
+// ========== CONFIRM BUTTON ==========
+document.getElementById("confirm").onclick = async () => {
+    if (currentIndex === null) return;
+    
+    const item = tuitionData[currentIndex];
+    const salary = item.salary || calculateSalary(item.subjects);
+    
+    // Save to Firestore
+    try {
+        await addDoc(collection(db, "applications"), {
+            postId: item.id,
+            postDetails: {
+                classNum: item.classNum,
+                medium: item.medium,
+                location: item.location,
+                subjects: item.subjects,
+                salary: salary
+            },
+            tutorId: userDocId,
+            tutorName: userName || "Unknown",
+            tutorEmail: userEmail,
+            status: "pending",
+            appliedAt: serverTimestamp()
+        });
+        
+        // Update local state
+        applied.push(currentIndex);
+        localStorage.setItem("applied", JSON.stringify(applied));
+        
+        // Close popup
+        popup.classList.remove("active");
+        
+        // Re-render
+        render();
+        renderDashboard();
+        
+        // Switch to dashboard
+        document.getElementById("p2").click();
+        
+    } catch (error) {
+        console.error("Error saving application:", error);
+        alert("Error submitting application. Please try again.");
+    }
+    
+    currentIndex = null;
+};
+
+// ========== CANCEL BUTTON ==========
+document.getElementById("cancel").onclick = () => {
+    popup.classList.remove("active");
+    currentIndex = null;
+};
+
+// ========== REMOVE BUTTON ==========
+document.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("remove-btn")) {
+        const index = Number(e.target.dataset.index);
+        
+        if (confirm("Are you sure you want to remove this application?")) {
+            applied = applied.filter(i => i !== index);
+            localStorage.setItem("applied", JSON.stringify(applied));
+            
+            render();
+            renderDashboard();
+        }
+    }
+});
+
+// ========== SEARCH ==========
+document.getElementById("search").addEventListener("input", function() {
+    const value = this.value;
+    document.querySelectorAll(".card").forEach(card => {
+        const classNum = card.querySelectorAll(".value")[1]?.innerText || "";
+        card.style.display = classNum.includes(value) ? "flex" : "none";
+    });
+});
+
+// ========== PAGE NAVIGATION ==========
+document.getElementById("p1").onclick = () => {
+    document.getElementById("page1").classList.add("active-page");
+    document.getElementById("page2").classList.remove("active-page");
+    document.getElementById("p1").classList.add("active");
+    document.getElementById("p2").classList.remove("active");
+};
+
+document.getElementById("p2").onclick = () => {
+    document.getElementById("page2").classList.add("active-page");
+    document.getElementById("page1").classList.remove("active-page");
+    document.getElementById("p2").classList.add("active");
+    document.getElementById("p1").classList.remove("active");
+    renderDashboard();
+};
+
+// ========== INITIALIZE ==========
+const grid = document.getElementById("grid");
+const dashboard = document.getElementById("dashboard");
+const popup = document.getElementById("popup");
+const popupDetails = document.getElementById("popupDetails");
+
+loadTuitionPosts();
+</script>
+
+</body>
+</html>

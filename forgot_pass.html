@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - TutorPoint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { 
+            background: #fde7f3; 
+            font-family: Arial; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .reset-card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 400px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+        h2 { 
+            color: #8e164d; 
+            text-align: center; 
+            margin-bottom: 10px; 
+        }
+        p { 
+            text-align: center; 
+            font-size: 13px; 
+            color: #666; 
+            margin-bottom: 20px; 
+        }
+        .input-group { 
+            margin-bottom: 15px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+        }
+        .reset-btn { 
+            width: 100%; 
+            background: #8e164d; 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 30px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 10px; 
+        }
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #c13584;
+            display: none;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #8e164d;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="reset-card">
+        <h2>Reset Password</h2>
+        <p>আপনার ফোন নাম্বার দিয়ে নতুন পাসওয়ার্ড সেট করুন।</p>
+        <form id="resetForm">
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="tel" id="resetPhone" placeholder="017XXXXXXXX" required>
+            </div>
+            <div class="input-group">
+                <label>New Password</label>
+                <input type="password" id="newPass" placeholder="Enter new password" required>
+            </div>
+            <div class="input-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPass" placeholder="Confirm new password" required>
+            </div>
+            <button type="submit" class="reset-btn">Update Password</button>
+        </form>
+        <div id="message" class="message"></div>
+        <a href="login.html" class="back-link">Back to Login</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+            authDomain: "medialert-a04d5.firebaseapp.com",
+            projectId: "medialert-a04d5",
+            storageBucket: "medialert-a04d5.firebasestorage.app",
+            messagingSenderId: "267657249954",
+            appId: "1:267657249954:web:01165929839cb83e7e03fb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('resetForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const phone = document.getElementById('resetPhone').value;
+            const newPass = document.getElementById('newPass').value;
+            const confirmPass = document.getElementById('confirmPass').value;
+            const messageDiv = document.getElementById('message');
+            
+            if(newPass !== confirmPass) {
+                messageDiv.style.display = "block";
+                messageDiv.style.color = "red";
+                messageDiv.innerText = "পাসওয়ার্ড মেলেনি!";
+                return;
+            }
+            
+            try {
+                // Check in tutors collection
+                const tutorsRef = collection(db, "tutors");
+                const tutorQuery = query(tutorsRef, where("phone", "==", phone));
+                const tutorSnapshot = await getDocs(tutorQuery);
+                
+                if (!tutorSnapshot.empty) {
+                    // Update tutor password
+                    const tutorDoc = tutorSnapshot.docs[0];
+                    await updateDoc(tutorDoc.ref, { password: newPass });
+                    
+                    messageDiv.style.display = "block";
+                    messageDiv.style.color = "green";
+                    messageDiv.innerText = "পাসওয়ার্ড সফলভাবে আপডেট হয়েছে! ৩ সেকেন্ড পর লগইন পৃষ্ঠায় যাচ্ছেন...";
+                    
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 3000);
+                    return;
+                }
+                
+                // Check in users collection
+                const usersRef = collection(db, "users");
+                const userQuery = query(usersRef, where("phone", "==", phone));
+                const userSnapshot = await getDocs(userQuery);
+                
+                if (!userSnapshot.empty) {
+                    // Update user password
+                    const userDoc = userSnapshot.docs[0];
+                    await updateDoc(userDoc.ref, { password: newPass });
+                    
+                    messageDiv.style.display = "block";
+                    messageDiv.style.color = "green";
+                    messageDiv.innerText = "পাসওয়ার্ড সফলভাবে আপডেট হয়েছে! ৩ সেকেন্ড পর লগইন পৃষ্ঠায় যাচ্ছেন...";
+                    
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 3000);
+                } else {
+                    messageDiv.style.display = "block";
+                    messageDiv.style.color = "red";
+                    messageDiv.innerText = "এই ফোন নাম্বারে কোনো অ্যাকাউন্ট পাওয়া যায়নি!";
+                }
+                
+            } catch (error) {
+                console.error("Error updating password:", error);
+                messageDiv.style.display = "block";
+                messageDiv.style.color = "red";
+                messageDiv.innerText = "কোনো সমস্যা হয়েছে! আবার চেষ্টা করুন।";
+            }
+        });
+    </script>
+</body>
+</html>
