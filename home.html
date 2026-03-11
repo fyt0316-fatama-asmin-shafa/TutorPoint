@@ -58,7 +58,7 @@
             height: auto;
         }
 
-        /* ========== হ্যামবার্গার মেনু (মোবাইলের জন্য) ========== */
+        /* ========== হ্যামবার্গার মেনু (মোবাইলের জন্য - ডান পাশে) ========== */
         .hamburger-menu {
             display: none;
             font-size: 28px;
@@ -71,6 +71,8 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            margin-left: auto;
+            /* ডান পাশে নেওয়ার জন্য */
         }
 
         .hamburger-menu:hover {
@@ -83,24 +85,26 @@
             display: none;
             position: fixed;
             top: 0;
-            left: -100%;
+            right: -100%;
+            /* ডান দিক থেকে স্লাইড হবে */
             width: 280px;
             height: 100vh;
             background: linear-gradient(180deg, #8e164d, #c13584, #d86bae);
             z-index: 1000;
-            transition: left 0.4s ease;
+            transition: right 0.4s ease;
             padding: 80px 20px 30px;
-            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
         }
 
         .mobile-menu.active {
-            left: 0;
+            right: 0;
         }
 
         .mobile-menu-header {
             position: absolute;
             top: 15px;
-            right: 15px;
+            left: 15px;
+            /* বাম পাশে রাখা হয়েছে */
             color: white;
             font-size: 30px;
             cursor: pointer;
@@ -1630,6 +1634,9 @@
         @media (max-width: 768px) {
             nav {
                 padding: 0 20px;
+                position: relative;
+                /* ভিডিওর ওপরে থাকার জন্য */
+                z-index: 20;
             }
 
             .nav-links,
@@ -1639,6 +1646,8 @@
 
             .hamburger-menu {
                 display: flex;
+                margin-left: auto;
+                /* ডান পাশে নেওয়ার জন্য */
             }
 
             .hero h1 {
@@ -1728,57 +1737,15 @@
 
 <body>
 
-    <!-- ========== হ্যামবার্গার মেনু আইকন ========== -->
-    <div class="hamburger-menu" onclick="openMobileMenu()">
-        <i class="fas fa-bars"></i>
-    </div>
-
-    <!-- ========== মোবাইল মেনু (স্লাইডিং) ========== -->
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-header" onclick="closeMobileMenu()">
-            <i class="fas fa-times"></i>
-        </div>
-
-        <div class="mobile-menu-links">
-            <a href="javascript:void(0)" onclick="openHowItWorks(); closeMobileMenu()">
-                <i class="fas fa-question-circle"></i> How it works
-            </a>
-            <a href="javascript:void(0)" onclick="openTerms(); closeMobileMenu()">
-                <i class="fas fa-file-contract"></i> Terms & Condition
-            </a>
-            <a href="find_tutor.html">
-                <i class="fas fa-search"></i> Find Tutors
-            </a>
-            <a href="apply_for_tution.html">
-                <i class="fas fa-paper-plane"></i> Apply for Tution
-            </a>
-            <a href="become_tutor.html">
-                <i class="fas fa-chalkboard-teacher"></i> Become Tutor
-            </a>
-        </div>
-
-        <div class="mobile-auth-links" id="mobileAuthLinks">
-            <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="create_account.html"><i class="fas fa-user-plus"></i> Create Account</a>
-        </div>
-
-        <div class="mobile-user-info" id="mobileUserInfo">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="mobile-user-img"
-                id="mobileUserImg">
-            <div class="mobile-user-details">
-                <div id="mobileUserName"></div>
-                <div class="mobile-user-role" id="mobileUserRole"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== ওভারলে (মোবাইল মেনু খোলা থাকলে) ========== -->
-    <div class="overlay" id="overlay" onclick="closeMobileMenu()"></div>
-
     <!-- ========== NAVBAR SECTION ========== -->
     <nav>
         <div class="logo-container">
             <img src="logo.png" alt="Logo" class="logo-img">
+        </div>
+
+        <!-- হ্যামবার্গার আইকন (এখন nav এর ডান পাশে) -->
+        <div class="hamburger-menu" onclick="openMobileMenu()">
+            <i class="fas fa-bars"></i>
         </div>
 
         <div class="nav-right">
@@ -1809,6 +1776,49 @@
             </div>
         </div>
     </nav>
+
+    <!-- ========== মোবাইল মেনু (ডান দিক থেকে স্লাইড হবে) ========== -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header" onclick="closeMobileMenu()">
+            <i class="fas fa-times"></i>
+        </div>
+
+        <div class="mobile-menu-links">
+            <a href="javascript:void(0)" onclick="openHowItWorks(); closeMobileMenu()">
+                <i class="fas fa-question-circle"></i> How it works
+            </a>
+            <a href="javascript:void(0)" onclick="openTerms(); closeMobileMenu()">
+                <i class="fas fa-file-contract"></i> Terms & Condition
+            </a>
+            <a href="find_tutor.html" onclick="closeMobileMenu()">
+                <i class="fas fa-search"></i> Find Tutors
+            </a>
+            <a href="apply_for_tution.html" onclick="closeMobileMenu()">
+                <i class="fas fa-paper-plane"></i> Apply for Tution
+            </a>
+            <a href="become_tutor.html" onclick="closeMobileMenu()">
+                <i class="fas fa-chalkboard-teacher"></i> Become Tutor
+            </a>
+        </div>
+
+        <div class="mobile-auth-links" id="mobileAuthLinks">
+            <a href="login.html" onclick="closeMobileMenu()"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="create_account.html" onclick="closeMobileMenu()"><i class="fas fa-user-plus"></i> Create
+                Account</a>
+        </div>
+
+        <div class="mobile-user-info" id="mobileUserInfo">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="mobile-user-img"
+                id="mobileUserImg">
+            <div class="mobile-user-details">
+                <div id="mobileUserName"></div>
+                <div class="mobile-user-role" id="mobileUserRole"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ওভারলে (মোবাইল মেনু খোলা থাকলে) ========== -->
+    <div class="overlay" id="overlay" onclick="closeMobileMenu()"></div>
 
     <!-- ========== হিরো সেকশন ========== -->
     <div class="hero">
@@ -2207,11 +2217,13 @@
         window.openMobileMenu = function () {
             document.getElementById("mobileMenu").classList.add("active");
             document.getElementById("overlay").classList.add("active");
+            document.body.style.overflow = "hidden"; // স্ক্রোল বন্ধ
         };
 
         window.closeMobileMenu = function () {
             document.getElementById("mobileMenu").classList.remove("active");
             document.getElementById("overlay").classList.remove("active");
+            document.body.style.overflow = "auto"; // স্ক্রোল চালু
         };
 
         // ========== MODAL FUNCTIONS ==========
@@ -3226,6 +3238,12 @@
             const contactModal = document.getElementById("contactModal");
             if (event.target === contactModal) {
                 closeContactModal();
+            }
+
+            const mobileMenu = document.getElementById("mobileMenu");
+            const overlay = document.getElementById("overlay");
+            if (event.target === overlay) {
+                closeMobileMenu();
             }
         };
 
