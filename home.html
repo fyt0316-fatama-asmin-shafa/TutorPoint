@@ -48,7 +48,7 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 7px;
             position: relative;
         }
 
@@ -1776,47 +1776,35 @@
             </div>
         </div>
     </nav>
-
-    <!-- ========== মোবাইল মেনু (ডান দিক থেকে স্লাইড হবে) ========== -->
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-header" onclick="closeMobileMenu()">
-            <i class="fas fa-times"></i>
-        </div>
-
-        <div class="mobile-menu-links">
-            <a href="javascript:void(0)" onclick="openHowItWorks(); closeMobileMenu()">
-                <i class="fas fa-question-circle"></i> How it works
-            </a>
-            <a href="javascript:void(0)" onclick="openTerms(); closeMobileMenu()">
-                <i class="fas fa-file-contract"></i> Terms & Condition
-            </a>
-            <a href="find_tutor.html" onclick="closeMobileMenu()">
-                <i class="fas fa-search"></i> Find Tutors
-            </a>
-            <a href="apply_for_tution.html" onclick="closeMobileMenu()">
-                <i class="fas fa-paper-plane"></i> Apply for Tution
-            </a>
-            <a href="become_tutor.html" onclick="closeMobileMenu()">
-                <i class="fas fa-chalkboard-teacher"></i> Become Tutor
-            </a>
-        </div>
-
-        <div class="mobile-auth-links" id="mobileAuthLinks">
-            <a href="login.html" onclick="closeMobileMenu()"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="create_account.html" onclick="closeMobileMenu()"><i class="fas fa-user-plus"></i> Create
-                Account</a>
-        </div>
-
-        <div class="mobile-user-info" id="mobileUserInfo">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="mobile-user-img"
-                id="mobileUserImg">
-            <div class="mobile-user-details">
-                <div id="mobileUserName"></div>
-                <div class="mobile-user-role" id="mobileUserRole"></div>
-            </div>
-        </div>
+<!-- ========== মোবাইল মেনু (ডান দিক থেকে স্লাইড হবে) ========== -->
+<div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header" onclick="closeMobileMenu()">
+        <i class="fas fa-times"></i>
     </div>
 
+    <div class="mobile-menu-links">
+        <!-- শুধু এই ৪টি বাটন থাকবে -->
+        <a href="javascript:void(0)" onclick="openHowItWorks(); closeMobileMenu()">
+            <i class="fas fa-question-circle"></i> How it works
+        </a>
+        <a href="javascript:void(0)" onclick="openTerms(); closeMobileMenu()">
+            <i class="fas fa-file-contract"></i> Terms & Condition
+        </a>
+    </div>
+
+    <div class="mobile-auth-links" id="mobileAuthLinks">
+        <a href="login.html" onclick="closeMobileMenu()"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="create_account.html" onclick="closeMobileMenu()"><i class="fas fa-user-plus"></i> Create Account</a>
+    </div>
+
+    <div class="mobile-user-info" id="mobileUserInfo">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="mobile-user-img" id="mobileUserImg">
+        <div class="mobile-user-details">
+            <div id="mobileUserName"></div>
+            <div class="mobile-user-role" id="mobileUserRole"></div>
+        </div>
+    </div>
+</div>
     <!-- ========== ওভারলে (মোবাইল মেনু খোলা থাকলে) ========== -->
     <div class="overlay" id="overlay" onclick="closeMobileMenu()"></div>
 
