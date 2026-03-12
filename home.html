@@ -1776,14 +1776,14 @@
             </div>
         </div>
     </nav>
-<!-- ========== মোবাইল মেনু (ডান দিক থেকে স্লাইড হবে) ========== -->
+<!-- ========== মোবাইল মেনু (শুধু ৪টি বাটন) ========== -->
 <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-header" onclick="closeMobileMenu()">
         <i class="fas fa-times"></i>
     </div>
 
+    <!-- How it works & Terms & Condition -->
     <div class="mobile-menu-links">
-        <!-- শুধু এই ৪টি বাটন থাকবে -->
         <a href="javascript:void(0)" onclick="openHowItWorks(); closeMobileMenu()">
             <i class="fas fa-question-circle"></i> How it works
         </a>
@@ -1792,11 +1792,13 @@
         </a>
     </div>
 
+    <!-- Login & Create Account (লগইন না করা অবস্থায়) -->
     <div class="mobile-auth-links" id="mobileAuthLinks">
         <a href="login.html" onclick="closeMobileMenu()"><i class="fas fa-sign-in-alt"></i> Login</a>
         <a href="create_account.html" onclick="closeMobileMenu()"><i class="fas fa-user-plus"></i> Create Account</a>
     </div>
 
+    <!-- ইউজার তথ্য (লগইন করা অবস্থায়) -->
     <div class="mobile-user-info" id="mobileUserInfo">
         <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="mobile-user-img" id="mobileUserImg">
         <div class="mobile-user-details">
