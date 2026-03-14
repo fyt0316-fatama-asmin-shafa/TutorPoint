@@ -58,7 +58,7 @@
             height: auto;
         }
 
-        /* ========== হ্যামবার্গার মেনু (মোবাইলের জন্য - ডান পাশে) ========== */
+        /* ========== হ্যামবার্গার মেনু (মোবাইলের জন্য) ========== */
         .hamburger-menu {
             display: none;
             font-size: 28px;
@@ -72,7 +72,6 @@
             justify-content: center;
             transition: all 0.3s ease;
             margin-left: auto;
-            /* ডান পাশে নেওয়ার জন্য */
         }
 
         .hamburger-menu:hover {
@@ -80,13 +79,12 @@
             transform: scale(1.1);
         }
 
-        /* মোবাইল মেনু - এখন শুধু ৪টি বাটন দেখাবে */
+        /* মোবাইল মেনু - ৪টি বাটন */
         .mobile-menu {
             display: none;
             position: fixed;
             top: 0;
             right: -100%;
-            /* ডান দিক থেকে স্লাইড হবে */
             width: 280px;
             height: 100vh;
             background: linear-gradient(180deg, #8e164d, #c13584, #d86bae);
@@ -105,7 +103,6 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            /* ডান পাশে রাখা হয়েছে */
             color: white;
             font-size: 30px;
             cursor: pointer;
@@ -122,7 +119,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* মোবাইল মেনুর ৪টি বাটন */
         .mobile-menu-buttons {
             display: flex;
             flex-direction: column;
@@ -174,7 +170,7 @@
             display: block;
         }
 
-        /* ন্যাভবারের ডান পাশের অংশ (ডেস্কটপ) */
+        /* ন্যাভবারের ডান পাশের অংশ (ডেস্কটপ ও মোবাইল) */
         .nav-right {
             display: flex;
             align-items: center;
@@ -231,7 +227,7 @@
             box-shadow: 0 8px 20px rgba(48, 64, 186, 0.5);
         }
 
-        /* ইউজার প্রোফাইল এরিয়া (লগইন করলে দেখাবে) - ডেস্কটপ */
+        /* ইউজার প্রোফাইল এরিয়া (লগইন করলে দেখাবে) - ডেস্কটপ ও মোবাইল */
         .user-profile-area {
             display: none;
             align-items: center;
@@ -1588,21 +1584,22 @@
             nav {
                 padding: 0 20px;
                 position: relative;
-                /* ভিডিওর ওপরে থাকার জন্য */
                 z-index: 20;
             }
 
             .nav-links,
-            .auth-links,
-            .user-profile-area {
+            .auth-links {
                 display: none !important;
-                /* মোবাইলে সব লিংক লুকানো */
+            }
+
+            /* মোবাইলে প্রোফাইল এরিয়া দেখাবে */
+            .user-profile-area {
+                display: none !important; /* ডিফল্ট লুকানো, জাভাস্ক্রিপ্ট দেখাবে */
             }
 
             .hamburger-menu {
                 display: flex;
                 margin-left: auto;
-                /* ডান পাশে নেওয়ার জন্য */
             }
 
             .hero h1 {
@@ -1698,7 +1695,7 @@
             <img src="logo.png" alt="Logo" class="logo-img">
         </div>
 
-        <!-- হ্যামবার্গার আইকন (এখন nav এর ডান পাশে) -->
+        <!-- হ্যামবার্গার আইকন (মোবাইলের জন্য) -->
         <div class="hamburger-menu" onclick="openMobileMenu()">
             <i class="fas fa-bars"></i>
         </div>
@@ -2155,13 +2152,13 @@
         window.openMobileMenu = function () {
             document.getElementById("mobileMenu").classList.add("active");
             document.getElementById("overlay").classList.add("active");
-            document.body.style.overflow = "hidden"; // স্ক্রোল বন্ধ
+            document.body.style.overflow = "hidden";
         };
 
         window.closeMobileMenu = function () {
             document.getElementById("mobileMenu").classList.remove("active");
             document.getElementById("overlay").classList.remove("active");
-            document.body.style.overflow = "auto"; // স্ক্রোল চালু
+            document.body.style.overflow = "auto";
         };
 
         // ========== MODAL FUNCTIONS ==========
@@ -2178,14 +2175,14 @@
             const modal = document.getElementById("howItWorksModal");
             modal.classList.remove("fade-out");
             modal.style.display = "flex";
-            closeMobileMenu(); // মোবাইল মেনু বন্ধ করবে
+            closeMobileMenu();
         };
 
         window.openTerms = function () {
             const modal = document.getElementById("termsModal");
             modal.classList.remove("fade-out");
             modal.style.display = "flex";
-            closeMobileMenu(); // মোবাইল মেনু বন্ধ করবে
+            closeMobileMenu();
         };
 
         window.closeTerms = function () {
@@ -2890,7 +2887,10 @@
 
         window.checkLogin = async function () {
             if (localStorage.getItem("userLoggedIn") === "true") {
+                // লগইন করা থাকলে Login/Create Account লুকাও
                 document.getElementById("authLinks").style.display = "none";
+                
+                // প্রোফাইল এরিয়া দেখাও (মোবাইল ও ডেস্কটপ উভয় ক্ষেত্রেই)
                 document.getElementById("userProfileArea").style.display = "flex";
 
                 currentUserType = localStorage.getItem("userType") || "user";
@@ -2922,6 +2922,7 @@
                     await loadUserData(userEmail, currentUserType);
                 }
             } else {
+                // লগইন না থাকলে Login/Create Account দেখাও
                 document.getElementById("authLinks").style.display = "flex";
                 document.getElementById("userProfileArea").style.display = "none";
             }
@@ -3196,5 +3197,4 @@
         }
     </script>
 </body>
-
 </html>
