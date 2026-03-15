@@ -63,7 +63,6 @@ border-radius:40px;
 
 .salary{
 background:#e3f0ec;
-
 padding:0.2rem 1rem;
 border-radius:40px;
 }
@@ -86,7 +85,6 @@ position:fixed;inset:0;
 background:rgba(0,0,0,0.5);
 display:flex;justify-content:center;align-items:center;
 visibility:hidden;opacity:0;transition:0.2s;
-
 }
 .popup.active{visibility:visible;opacity:1}
 
@@ -106,13 +104,13 @@ flex:1;padding:0.6rem;border-radius:30px;border:none;cursor:pointer;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
 gap:1.5rem;
-
 }
 
 .dashboard-card{
 background:white;padding:1.5rem;
 border-radius:20px;
 border-left:5px solid #56738f;
+position:relative;
 }
 .remove-btn{
 margin-top:0.8rem;
@@ -141,15 +139,12 @@ width:250px;
 </div>
 
 <div class="page active-page" id="page1">
-
 <input type="text" id="search" placeholder="Search by Class (6,7,8...)">
-
 <div class="grid" id="grid"></div>
 </div>
 
 <div class="page" id="page2">
 <div class="applied-list" id="dashboard"></div>
-
 </div>
 
 </div>
@@ -168,7 +163,7 @@ width:250px;
 <script type="module">
 // ========== FIREBASE IMPORTS ==========
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ========== FIREBASE CONFIG ==========
 const firebaseConfig = {
@@ -190,9 +185,10 @@ const userDocId = localStorage.getItem("userDocId");
 const userEmail = localStorage.getItem("userEmail");
 const userName = localStorage.getItem("userName");
 
-let applied = JSON.parse(localStorage.getItem("applied")) || [];
+let appliedPostIds = new Set(); // Store applied post IDs
 let tuitionData = [];
-let currentIndex = null;
+let currentPostId = null;
+let applications = []; // Store full application data
 
 // ========== SAMPLE DATA (IF FIRESTORE EMPTY) ==========
 const sampleData = [
@@ -307,20 +303,15 @@ async function loadApplications() {
         const q = query(appsRef, where("tutorId", "==", userDocId));
         const snapshot = await getDocs(q);
         
-        // Clear localStorage applied array
-        applied = [];
+        // Clear existing data
+        appliedPostIds.clear();
+        applications = [];
         
         snapshot.forEach(doc => {
-            const app = doc.data();
-            // Find the index of this post in tuitionData
-            const postIndex = tuitionData.findIndex(post => post.id === app.postId);
-            if (postIndex !== -1) {
-                applied.push(postIndex);
-            }
+            const app = { id: doc.id, ...doc.data() };
+            applications.push(app);
+            appliedPostIds.add(app.postId);
         });
-        
-        // Save to localStorage
-        localStorage.setItem("applied", JSON.stringify(applied));
         
         render();
         renderDashboard();
@@ -339,26 +330,82 @@ function calculateSalary(subjects) {
 function render() {
     const grid = document.getElementById("grid");
     
-    grid.innerHTML = tuitionData.map((item, index) => {
-        const isApplied = applied.includes(index);
+    if (!isLoggedIn) {
+        grid.innerHTML = tuitionData.map((item) => {
+            const salary = item.salary || calculateSalary(item.subjects);
+            return `
+            <div class="card" data-id="${item.id}">
+                <div class="detail-row">
+                    <span>ID</span>
+                    <span class="value">${item.id}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Class</span>
+                    <span class="value">${item.classNum}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Medium</span>
+                    <span class="value">${item.medium}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Location</span>
+                    <span class="value">${item.location}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Subjects</span>
+                    <span class="value">${item.subjects.join(", ")}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Salary</span>
+                    <span class="salary">৳ ${salary}</span>
+                </div>
+                <button class="apply-btn" disabled>Login to Apply</button>
+            </div>`;
+        }).join("");
+        return;
+    }
+    
+    if (userType !== "tutor") {
+        grid.innerHTML = tuitionData.map((item) => {
+            const salary = item.salary || calculateSalary(item.subjects);
+            return `
+            <div class="card" data-id="${item.id}">
+                <div class="detail-row">
+                    <span>ID</span>
+                    <span class="value">${item.id}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Class</span>
+                    <span class="value">${item.classNum}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Medium</span>
+                    <span class="value">${item.medium}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Location</span>
+                    <span class="value">${item.location}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Subjects</span>
+                    <span class="value">${item.subjects.join(", ")}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Salary</span>
+                    <span class="salary">৳ ${salary}</span>
+                </div>
+                <button class="apply-btn" disabled>Only Tutors Can Apply</button>
+            </div>`;
+        }).join("");
+        return;
+    }
+    
+    grid.innerHTML = tuitionData.map((item) => {
+        const isApplied = appliedPostIds.has(item.id);
         const salary = item.salary || calculateSalary(item.subjects);
         
-        // Check if user can apply
-        let canApply = false;
-        let buttonText = "Apply";
-        
-        if (isApplied) {
-            buttonText = "Applied";
-        } else if (!isLoggedIn) {
-            buttonText = "Login to Apply";
-        } else if (userType !== "tutor") {
-            buttonText = "Only Tutors Can Apply";
-        } else {
-            canApply = true;
-        }
-        
         return `
-        <div class="card" data-index="${index}">
+        <div class="card" data-id="${item.id}">
             <div class="detail-row">
                 <span>ID</span>
                 <span class="value">${item.id}</span>
@@ -383,29 +430,32 @@ function render() {
                 <span>Salary</span>
                 <span class="salary">৳ ${salary}</span>
             </div>
-            <button class="apply-btn ${isApplied ? 'applied' : ''}" ${!canApply || isApplied ? 'disabled' : ''}>
-                ${buttonText}
+            <button class="apply-btn ${isApplied ? 'applied' : ''}" ${isApplied ? 'disabled' : ''}>
+                ${isApplied ? 'Applied' : 'Apply'}
             </button>
         </div>`;
     }).join("");
     
     // Add click handlers to apply buttons
-    document.querySelectorAll(".apply-btn:not(.applied):not(:disabled)").forEach(btn => {
+    document.querySelectorAll(".apply-btn:not(.applied)").forEach(btn => {
         btn.onclick = (e) => {
             e.stopPropagation();
             const card = btn.closest(".card");
             if (card) {
-                currentIndex = card.dataset.index;
-                const item = tuitionData[currentIndex];
-                const salary = item.salary || calculateSalary(item.subjects);
-                
-                popupDetails.innerHTML = `
-                    <p><strong>ID:</strong> ${item.id}</p>
-                    <p><strong>Class:</strong> ${item.classNum}</p>
-                    <p><strong>Location:</strong> ${item.location}</p>
-                    <p><strong>Subjects:</strong> ${item.subjects.join(", ")}</p>
-                    <p><strong>Total Salary:</strong> ৳ ${salary}</p>`;
-                popup.classList.add("active");
+                const postId = card.dataset.id;
+                const post = tuitionData.find(p => p.id === postId);
+                if (post) {
+                    currentPostId = postId;
+                    const salary = post.salary || calculateSalary(post.subjects);
+                    
+                    document.getElementById("popupDetails").innerHTML = `
+                        <p><strong>ID:</strong> ${post.id}</p>
+                        <p><strong>Class:</strong> ${post.classNum}</p>
+                        <p><strong>Location:</strong> ${post.location}</p>
+                        <p><strong>Subjects:</strong> ${post.subjects.join(", ")}</p>
+                        <p><strong>Total Salary:</strong> ৳ ${salary}</p>`;
+                    document.getElementById("popup").classList.add("active");
+                }
             }
         };
     });
@@ -415,44 +465,62 @@ function render() {
 function renderDashboard() {
     const dashboard = document.getElementById("dashboard");
     
-    if (applied.length === 0) {
+    if (!isLoggedIn || userType !== "tutor" || applications.length === 0) {
         dashboard.innerHTML = "";
         return;
     }
     
-    dashboard.innerHTML = applied.map(index => {
-        const item = tuitionData[index];
-        if (!item) return '';
+    dashboard.innerHTML = applications.map(app => {
+        const post = tuitionData.find(p => p.id === app.postId);
+        if (!post) return '';
         
-        const salary = item.salary || calculateSalary(item.subjects);
+        const salary = post.salary || calculateSalary(post.subjects);
+        const appliedDate = app.appliedAt ? new Date(app.appliedAt.toDate()).toLocaleDateString() : 'Recently';
+        
         return `
         <div class="dashboard-card">
-            <div><strong>ID:</strong> ${item.id}</div>
-            <div>Class: ${item.classNum}</div>
-            <div>Location: ${item.location}</div>
-            <div>Subjects: ${item.subjects.join(", ")}</div>
+            <div><strong>ID:</strong> ${post.id}</div>
+            <div>Class: ${post.classNum}</div>
+            <div>Location: ${post.location}</div>
+            <div>Subjects: ${post.subjects.join(", ")}</div>
             <div><strong>Salary: ৳ ${salary}</strong></div>
-            <button class="remove-btn" data-index="${index}">Remove</button>
+            <div style="font-size:0.8rem; color:#666;">Applied: ${appliedDate}</div>
+            <button class="remove-btn" data-app-id="${app.id}" data-post-id="${post.id}">Remove</button>
         </div>`;
     }).join("");
 }
 
 // ========== CONFIRM BUTTON ==========
 document.getElementById("confirm").onclick = async () => {
-    if (currentIndex === null) return;
+    if (!currentPostId) return;
     
-    const item = tuitionData[currentIndex];
-    const salary = item.salary || calculateSalary(item.subjects);
+    const post = tuitionData.find(p => p.id === currentPostId);
+    if (!post) return;
     
-    // Save to Firestore
+    // Check if already applied
+    if (appliedPostIds.has(currentPostId)) {
+        alert("You have already applied for this post!");
+        document.getElementById("popup").classList.remove("active");
+        currentPostId = null;
+        return;
+    }
+    
+    const confirmBtn = document.getElementById("confirm");
+    const originalText = confirmBtn.textContent;
+    confirmBtn.textContent = "Submitting...";
+    confirmBtn.disabled = true;
+    
     try {
-        await addDoc(collection(db, "applications"), {
-            postId: item.id,
+        const salary = post.salary || calculateSalary(post.subjects);
+        
+        // Save to Firestore
+        const docRef = await addDoc(collection(db, "applications"), {
+            postId: post.id,
             postDetails: {
-                classNum: item.classNum,
-                medium: item.medium,
-                location: item.location,
-                subjects: item.subjects,
+                classNum: post.classNum,
+                medium: post.medium,
+                location: post.location,
+                subjects: post.subjects,
                 salary: salary
             },
             tutorId: userDocId,
@@ -463,11 +531,23 @@ document.getElementById("confirm").onclick = async () => {
         });
         
         // Update local state
-        applied.push(currentIndex);
-        localStorage.setItem("applied", JSON.stringify(applied));
+        appliedPostIds.add(post.id);
+        applications.push({
+            id: docRef.id,
+            postId: post.id,
+            postDetails: {
+                classNum: post.classNum,
+                medium: post.medium,
+                location: post.location,
+                subjects: post.subjects,
+                salary: salary
+            },
+            tutorId: userDocId,
+            status: "pending"
+        });
         
         // Close popup
-        popup.classList.remove("active");
+        document.getElementById("popup").classList.remove("active");
         
         // Re-render
         render();
@@ -479,28 +559,42 @@ document.getElementById("confirm").onclick = async () => {
     } catch (error) {
         console.error("Error saving application:", error);
         alert("Error submitting application. Please try again.");
+    } finally {
+        confirmBtn.textContent = originalText;
+        confirmBtn.disabled = false;
+        currentPostId = null;
     }
-    
-    currentIndex = null;
 };
 
 // ========== CANCEL BUTTON ==========
 document.getElementById("cancel").onclick = () => {
-    popup.classList.remove("active");
-    currentIndex = null;
+    document.getElementById("popup").classList.remove("active");
+    currentPostId = null;
 };
 
 // ========== REMOVE BUTTON ==========
 document.addEventListener("click", async (e) => {
     if (e.target.classList.contains("remove-btn")) {
-        const index = Number(e.target.dataset.index);
+        const appId = e.target.dataset.appId;
+        const postId = e.target.dataset.postId;
         
         if (confirm("Are you sure you want to remove this application?")) {
-            applied = applied.filter(i => i !== index);
-            localStorage.setItem("applied", JSON.stringify(applied));
-            
-            render();
-            renderDashboard();
+            try {
+                // Delete from Firestore
+                await deleteDoc(doc(db, "applications", appId));
+                
+                // Update local state
+                appliedPostIds.delete(postId);
+                applications = applications.filter(app => app.id !== appId);
+                
+                // Re-render
+                render();
+                renderDashboard();
+                
+            } catch (error) {
+                console.error("Error removing application:", error);
+                alert("Error removing application. Please try again.");
+            }
         }
     }
 });
@@ -531,12 +625,15 @@ document.getElementById("p2").onclick = () => {
 };
 
 // ========== INITIALIZE ==========
-const grid = document.getElementById("grid");
-const dashboard = document.getElementById("dashboard");
-const popup = document.getElementById("popup");
-const popupDetails = document.getElementById("popupDetails");
-
 loadTuitionPosts();
+
+// Close popup when clicking outside
+document.getElementById("popup").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("popup")) {
+        document.getElementById("popup").classList.remove("active");
+        currentPostId = null;
+    }
+});
 </script>
 
 </body>

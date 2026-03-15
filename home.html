@@ -50,7 +50,7 @@
             align-items: center;
             gap: 7px;
             position: relative;
-            margin-left: -30px;
+            margin-left: -25px;
         }
 
         /* লোগো ইমেজ */
@@ -2453,13 +2453,147 @@
             }
         });
 
+        // ========== STATISTICS FUNCTIONS ==========
+        async function loadTotalApplied() {
+            try {
+                // Get total applications count
+                const applicationsRef = collection(db, "applications");
+                const applicationsSnapshot = await getDocs(applicationsRef);
+                const totalApplied = applicationsSnapshot.size;
+                
+                // Also check if there's a separate jobs collection
+                let jobsCount = 0;
+                try {
+                    const jobsRef = collection(db, "jobs");
+                    const jobsSnapshot = await getDocs(jobsRef);
+                    jobsCount = jobsSnapshot.size;
+                } catch (e) {
+                    console.log("Jobs collection not found, using applications only");
+                }
+                
+                // Use the larger number or sum them
+                const finalCount = Math.max(totalApplied, jobsCount);
+                
+                // Animate the number
+                animateNumber("totalApplied", 0, finalCount, 2000);
+                
+                // Store in localStorage for other pages to access
+                localStorage.setItem("totalAppliedCount", finalCount.toString());
+                
+                return finalCount;
+            } catch (error) {
+                console.error("Error loading total applied:", error);
+                // If error, try to get from localStorage
+                const savedCount = localStorage.getItem("totalAppliedCount");
+                if (savedCount) {
+                    document.getElementById("totalApplied").textContent = savedCount;
+                } else {
+                    animateNumber("totalApplied", 0, 0, 1000);
+                }
+                return 0;
+            }
+        }
+
+        async function loadTotalTutors() {
+            try {
+                const tutorsRef = collection(db, "tutors");
+                const tutorsSnapshot = await getDocs(tutorsRef);
+                const totalTutors = tutorsSnapshot.size;
+                
+                animateNumber("totalTutors", 0, totalTutors, 2000);
+                localStorage.setItem("totalTutorsCount", totalTutors.toString());
+                
+                return totalTutors;
+            } catch (error) {
+                console.error("Error loading total tutors:", error);
+                const savedCount = localStorage.getItem("totalTutorsCount");
+                if (savedCount) {
+                    document.getElementById("totalTutors").textContent = savedCount;
+                } else {
+                    animateNumber("totalTutors", 0, 0, 1000);
+                }
+                return 0;
+            }
+        }
+
+        async function loadAverageRating() {
+            try {
+                const tutorsRef = collection(db, "tutors");
+                const tutorsSnapshot = await getDocs(tutorsRef);
+                
+                let totalRating = 0;
+                let tutorsWithRating = 0;
+
+                tutorsSnapshot.forEach((doc) => {
+                    const tutor = doc.data();
+                    if (tutor.averageRating && !isNaN(parseFloat(tutor.averageRating))) {
+                        totalRating += parseFloat(tutor.averageRating);
+                        tutorsWithRating++;
+                    }
+                });
+
+                let avgRating = 4.5; // Default rating
+                if (tutorsWithRating > 0) {
+                    avgRating = (totalRating / tutorsWithRating);
+                } else {
+                    // Generate random ratings based on tutor IDs for demo
+                    let randomRating = 0;
+                    let count = 0;
+                    tutorsSnapshot.forEach((doc) => {
+                        const tutorId = doc.id;
+                        const ratingValue = 3.5 + (parseInt(tutorId.slice(-2)) % 15) / 10;
+                        randomRating += ratingValue;
+                        count++;
+                    });
+                    if (count > 0) {
+                        avgRating = randomRating / count;
+                    }
+                }
+
+                // Round to 1 decimal
+                avgRating = Math.round(avgRating * 10) / 10;
+                
+                animateNumber("avgRating", 0, avgRating, 2000);
+                displayRatingStars(avgRating);
+                
+                localStorage.setItem("avgRating", avgRating.toString());
+                
+                return avgRating;
+            } catch (error) {
+                console.error("Error loading average rating:", error);
+                const savedRating = localStorage.getItem("avgRating");
+                if (savedRating) {
+                    document.getElementById("avgRating").textContent = savedRating;
+                    displayRatingStars(parseFloat(savedRating));
+                } else {
+                    animateNumber("avgRating", 0, 4.5, 2000);
+                    displayRatingStars(4.5);
+                }
+                return 4.5;
+            }
+        }
+
+        async function loadStatistics() {
+            // Show loading state
+            document.getElementById("totalApplied").textContent = "...";
+            document.getElementById("totalTutors").textContent = "...";
+            document.getElementById("avgRating").textContent = "...";
+            
+            // Load all statistics in parallel
+            await Promise.all([
+                loadTotalApplied(),
+                loadTotalTutors(),
+                loadAverageRating()
+            ]);
+        }
+
         // ========== ON PAGE LOAD ==========
         window.onload = function () {
             console.log("Page loaded, initializing...");
             checkLogin();
             loadPopularTutors();
             loadSubjectSlider();
-            loadStatistics();
+            loadStatistics(); // This will now get real data from Firestore
             setupRealtimeReviews();
 
             const isLoggedIn = localStorage.getItem("userLoggedIn") === "true";
@@ -2471,6 +2605,18 @@
             } else {
                 document.getElementById("howItWorksModal").style.display = "none";
             }
+            
+            // Listen for storage events to update count in real-time
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'totalAppliedCount') {
+                    document.getElementById("totalApplied").textContent = e.newValue;
+                } else if (e.key === 'totalTutorsCount') {
+                    document.getElementById("totalTutors").textContent = e.newValue;
+                } else if (e.key === 'avgRating') {
+                    document.getElementById("avgRating").textContent = e.newValue;
+                    displayRatingStars(parseFloat(e.newValue));
+                }
+            });
         };
 
         function setupRealtimeReviews() {
@@ -2586,9 +2732,9 @@
 
                     const profileImg = tutor.profilePic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
-                    const ratingNum = 3.5 + (parseInt(tutorId.slice(-2)) % 15) / 10;
+                    const ratingNum = tutor.averageRating || (3.5 + (parseInt(tutorId.slice(-2)) % 15) / 10);
                     const rating = ratingNum.toFixed(1);
-                    const reviewCount = Math.floor(Math.random() * 15) + 3;
+                    const reviewCount = tutor.reviewCount || Math.floor(Math.random() * 15) + 3;
 
                     let subjects = tutor.subject || 'N/A';
                     if (subjects.includes(',')) {
@@ -2665,66 +2811,6 @@
                 console.error("Error loading popular tutors:", error);
                 document.getElementById("popularTutorSlider").innerHTML =
                     "<p style='text-align:center; color:red;'>Error loading tutors. Please refresh.</p>";
-            }
-        }
-
-        async function loadStatistics() {
-            try {
-                const tutorsRef = collection(db, "tutors");
-                const tutorsSnapshot = await getDocs(tutorsRef);
-                const totalTutors = tutorsSnapshot.size;
-
-                let totalApplied = 0;
-                try {
-                    const jobsRef = collection(db, "jobs");
-                    const jobsSnapshot = await getDocs(jobsRef);
-                    totalApplied = jobsSnapshot.size;
-                } catch (e) {
-                    totalApplied = totalTutors;
-                }
-
-                let totalRating = 0;
-                let tutorsWithRating = 0;
-
-                tutorsSnapshot.forEach((doc) => {
-                    const tutor = doc.data();
-                    if (tutor.rating && !isNaN(parseFloat(tutor.rating))) {
-                        totalRating += parseFloat(tutor.rating);
-                        tutorsWithRating++;
-                    }
-                });
-
-                let avgRating = 4.7;
-                if (tutorsWithRating > 0) {
-                    avgRating = (totalRating / tutorsWithRating).toFixed(1);
-                } else {
-                    let randomRating = 0;
-                    let count = 0;
-
-                    tutorsSnapshot.forEach((doc) => {
-                        const tutorId = doc.id;
-                        const ratingValue = 3.5 + (parseInt(tutorId.slice(-2)) % 15) / 10;
-                        randomRating += ratingValue;
-                        count++;
-                    });
-
-                    if (count > 0) {
-                        avgRating = (randomRating / count).toFixed(1);
-                    }
-                }
-
-                animateNumber("totalApplied", 0, totalApplied, 2000);
-                animateNumber("totalTutors", 0, totalTutors, 2000);
-                animateNumber("avgRating", 0, parseFloat(avgRating), 2000);
-
-                displayRatingStars(parseFloat(avgRating));
-
-            } catch (error) {
-                console.error("Error loading statistics:", error);
-                animateNumber("totalApplied", 0, 5000, 2000);
-                animateNumber("totalTutors", 0, 1000, 2000);
-                animateNumber("avgRating", 0, 4.5, 2000);
-                displayRatingStars(4.5);
             }
         }
 
@@ -2887,24 +2973,9 @@
                     const tutor = tutorDoc.data();
                     const content = document.getElementById("tutorDetailsContent");
 
-                    let ratingNum = 4.5;
-                    if (tutor.rating && !isNaN(parseFloat(tutor.rating))) {
-                        ratingNum = parseFloat(tutor.rating);
-                    } else {
-                        try {
-                            if (tutorId && tutorId.length >= 2) {
-                                const lastTwoChars = tutorId.slice(-2);
-                                const parsedValue = parseInt(lastTwoChars, 10);
-                                if (!isNaN(parsedValue)) {
-                                    ratingNum = 3.5 + (parsedValue % 15) / 10;
-                                }
-                            }
-                        } catch (e) {
-                            ratingNum = 4.5;
-                        }
-                    }
+                    let ratingNum = tutor.averageRating || 4.5;
                     const rating = ratingNum.toFixed(1);
-                    const reviewCount = Math.floor(Math.random() * 30) + 10;
+                    const reviewCount = tutor.reviewCount || Math.floor(Math.random() * 30) + 10;
 
                     const displayData = `
                         <div class="tutor-details-header">
@@ -3273,11 +3344,21 @@
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 const value = Math.floor(progress * (end - start) + start);
-                element.textContent = elementId === "avgRating" ? (value / 10).toFixed(1) : value.toLocaleString();
+                
+                if (elementId === "avgRating") {
+                    element.textContent = (value / 10).toFixed(1);
+                } else {
+                    element.textContent = value.toLocaleString();
+                }
+                
                 if (progress < 1) {
                     window.requestAnimationFrame(step);
                 } else {
-                    element.textContent = elementId === "avgRating" ? end.toFixed(1) : end.toLocaleString();
+                    if (elementId === "avgRating") {
+                        element.textContent = end.toFixed(1);
+                    } else {
+                        element.textContent = end.toLocaleString();
+                    }
                 }
             };
             window.requestAnimationFrame(step);
