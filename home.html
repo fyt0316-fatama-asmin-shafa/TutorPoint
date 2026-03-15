@@ -1587,25 +1587,28 @@
                 gap: 20px;
             }
         }
+@media (max-width: 768px) {
+    nav {
+        padding: 0 20px;
+        position: relative;
+        z-index: 20;
+    }
 
-        @media (max-width: 768px) {
-            nav {
-                padding: 0 20px;
-                position: relative;
-                z-index: 20;
-            }
-
-            /* ডেস্কটপ লিংক লুকানো */
-            .nav-links,
-            .auth-links {
-                display: none !important;
-            }
-            
-            /* মোবাইলে প্রোফাইল এরিয়া দেখানো হবে যখন লগইন করা থাকবে */
-            .user-profile-area {
-                display: flex !important;
-            }
-            
+    /* ডেস্কটপ লিংক লুকানো */
+    .nav-links,
+    .auth-links {
+        display: none !important;
+    }
+    
+    /* মোবাইলে প্রোফাইল এরিয়া শুধু তখনই দেখাবে যখন লগইন করা থাকবে */
+    .user-profile-area {
+        display: none !important; /* পরিবর্তন: ডিফল্টভাবে লুকানো থাকবে */
+    }
+    
+    /* যখন লগইন করা থাকবে তখন jQuery/JavaScript দিয়ে show করা হবে */
+    .user-profile-area.show-in-mobile {
+        display: flex !important;
+    }       
             /* হ্যামবার্গার মেনু দেখানো */
             .hamburger-menu {
                 display: flex;
@@ -2925,43 +2928,47 @@
         };
 
         window.checkLogin = async function () {
-            if (localStorage.getItem("userLoggedIn") === "true") {
-                document.getElementById("authLinks").style.display = "none";
-                document.getElementById("userProfileArea").style.display = "flex";
+    if (localStorage.getItem("userLoggedIn") === "true") {
+        document.getElementById("authLinks").style.display = "none";
+        document.getElementById("userProfileArea").style.display = "flex";
+        
+        // মোবাইলের জন্য ক্লাস যোগ করুন
+        document.getElementById("userProfileArea").classList.add("show-in-mobile");
 
-                currentUserType = localStorage.getItem("userType") || "user";
-                currentUserRole = localStorage.getItem("userRole");
-                currentUserName = localStorage.getItem("userName");
-                currentUserImg = localStorage.getItem("userImg");
+        currentUserType = localStorage.getItem("userType") || "user";
+        currentUserRole = localStorage.getItem("userRole");
+        currentUserName = localStorage.getItem("userName");
+        currentUserImg = localStorage.getItem("userImg");
 
-                const roleBadge = document.getElementById("userRoleDisplay");
-                if (currentUserType === "tutor") {
-                    roleBadge.textContent = "👨‍🏫 Tutor";
-                    roleBadge.style.display = "inline-block";
-                } else {
-                    roleBadge.textContent = currentUserRole === "student" ? "👨‍🎓 Student" :
-                        currentUserRole === "guardian" ? "👪 Guardian" : "👤 User";
-                    roleBadge.style.display = "inline-block";
-                }
+        const roleBadge = document.getElementById("userRoleDisplay");
+        if (currentUserType === "tutor") {
+            roleBadge.textContent = "👨‍🏫 Tutor";
+            roleBadge.style.display = "inline-block";
+        } else {
+            roleBadge.textContent = currentUserRole === "student" ? "👨‍🎓 Student" :
+                currentUserRole === "guardian" ? "👪 Guardian" : "👤 User";
+            roleBadge.style.display = "inline-block";
+        }
 
-                const savedImg = localStorage.getItem("userImg");
-                if (savedImg) {
-                    document.getElementById("displayPic").src = savedImg;
-                }
+        const savedImg = localStorage.getItem("userImg");
+        if (savedImg) {
+            document.getElementById("displayPic").src = savedImg;
+        }
 
-                const userEmail = localStorage.getItem("userEmail");
-                const userDocId = localStorage.getItem("userDocId");
-                if (userDocId) {
-                    currentUserDocId = userDocId;
-                    currentUserEmail = userEmail;
-                } else if (userEmail) {
-                    await loadUserData(userEmail, currentUserType);
-                }
-            } else {
-                document.getElementById("authLinks").style.display = "flex";
-                document.getElementById("userProfileArea").style.display = "none";
-            }
-        };
+        const userEmail = localStorage.getItem("userEmail");
+        const userDocId = localStorage.getItem("userDocId");
+        if (userDocId) {
+            currentUserDocId = userDocId;
+            currentUserEmail = userEmail;
+        } else if (userEmail) {
+            await loadUserData(userEmail, currentUserType);
+        }
+    } else {
+        document.getElementById("authLinks").style.display = "flex";
+        document.getElementById("userProfileArea").style.display = "none";
+        document.getElementById("userProfileArea").classList.remove("show-in-mobile"); // মোবাইলের ক্লাস সরান
+    }
+};
 
         async function loadUserData(email, type) {
             try {
@@ -3086,84 +3093,88 @@
             reader.readAsDataURL(e.target.files[0]);
         });
 
-        window.saveProfileChanges = async function () {
-            if (!currentUserDocId) {
-                alert("User not found!");
-                return;
-            }
+      window.saveProfileChanges = async function () {
+    if (!currentUserDocId) {
+        alert("User not found!");
+        return;
+    }
 
-            let updatedData = {
-                name: document.getElementById("editName").value,
-                phone: document.getElementById("editPhone").value,
-                email: document.getElementById("editEmail").value,
-                profilePic: document.getElementById("editProfilePic").src
-            };
+    let updatedData = {
+        name: document.getElementById("editName").value,
+        phone: document.getElementById("editPhone").value,
+        email: document.getElementById("editEmail").value,
+        profilePic: document.getElementById("editProfilePic").src
+    };
 
-            if (currentUserType === "tutor") {
-                updatedData = {
-                    ...updatedData,
-                    qualification: document.getElementById("editEdu").value,
-                    subject: document.getElementById("editSubject").value.toLowerCase(),
-                    area: document.getElementById("editArea").value.toLowerCase(),
-                    experience: document.getElementById("editExperience").value,
-                    salary: document.getElementById("editSalary").value,
-                    preferredClass: document.getElementById("editClass").value,
-                    nid: document.getElementById("editNid").value
-                };
-            } else {
-                updatedData = {
-                    ...updatedData,
-                    role: document.getElementById("editRole").value
-                };
-            }
-
-            try {
-                let collectionName = currentUserType === "tutor" ? "tutors" : "users";
-                const userRef = doc(db, collectionName, currentUserDocId);
-                await updateDoc(userRef, updatedData);
-
-                localStorage.setItem("userName", updatedData.name);
-                localStorage.setItem("userPhone", updatedData.phone);
-                localStorage.setItem("userEmail", updatedData.email);
-                localStorage.setItem("userImg", updatedData.profilePic);
-
-                currentUserName = updatedData.name;
-                currentUserImg = updatedData.profilePic;
-
-                if (currentUserType === "tutor") {
-                    localStorage.setItem("userEdu", updatedData.qualification);
-                    localStorage.setItem("userSubject", updatedData.subject);
-                    localStorage.setItem("userArea", updatedData.area);
-                    localStorage.setItem("userExperience", updatedData.experience);
-                    localStorage.setItem("userSalary", updatedData.salary);
-                    localStorage.setItem("userClass", updatedData.preferredClass);
-                    localStorage.setItem("userNid", updatedData.nid);
-                } else {
-                    localStorage.setItem("userRole", updatedData.role);
-                    document.getElementById("userRoleDisplay").textContent = updatedData.role === "student" ? "👨‍🎓 Student" :
-                        updatedData.role === "guardian" ? "👪 Guardian" : "👤 User";
-                }
-
-                document.getElementById("displayPic").src = updatedData.profilePic;
-                alert("Profile updated successfully!");
-                closeEditProfile();
-                loadPopularTutors();
-            } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("Error updating profile: " + error.message);
-            }
+    if (currentUserType === "tutor") {
+        updatedData = {
+            ...updatedData,
+            qualification: document.getElementById("editEdu").value,
+            subject: document.getElementById("editSubject").value.toLowerCase(),
+            area: document.getElementById("editArea").value.toLowerCase(),
+            experience: document.getElementById("editExperience").value,
+            salary: document.getElementById("editSalary").value,
+            preferredClass: document.getElementById("editClass").value,
+            nid: document.getElementById("editNid").value
         };
+    } else {
+        updatedData = {
+            ...updatedData,
+            role: document.getElementById("editRole").value
+        };
+    }
+
+    try {
+        let collectionName = currentUserType === "tutor" ? "tutors" : "users";
+        const userRef = doc(db, collectionName, currentUserDocId);
+        await updateDoc(userRef, updatedData);
+
+        localStorage.setItem("userName", updatedData.name);
+        localStorage.setItem("userPhone", updatedData.phone);
+        localStorage.setItem("userEmail", updatedData.email);
+        localStorage.setItem("userImg", updatedData.profilePic);
+
+        currentUserName = updatedData.name;
+        currentUserImg = updatedData.profilePic;
+
+        if (currentUserType === "tutor") {
+            localStorage.setItem("userEdu", updatedData.qualification);
+            localStorage.setItem("userSubject", updatedData.subject);
+            localStorage.setItem("userArea", updatedData.area);
+            localStorage.setItem("userExperience", updatedData.experience);
+            localStorage.setItem("userSalary", updatedData.salary);
+            localStorage.setItem("userClass", updatedData.preferredClass);
+            localStorage.setItem("userNid", updatedData.nid);
+        } else {
+            localStorage.setItem("userRole", updatedData.role);
+            document.getElementById("userRoleDisplay").textContent = updatedData.role === "student" ? "👨‍🎓 Student" :
+                updatedData.role === "guardian" ? "👪 Guardian" : "👤 User";
+        }
+
+        document.getElementById("displayPic").src = updatedData.profilePic;
+        
+        // মোবাইলের জন্য ক্লাস নিশ্চিত করুন
+        document.getElementById("userProfileArea").classList.add("show-in-mobile");
+        
+        alert("Profile updated successfully!");
+        closeEditProfile();
+        loadPopularTutors();
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Error updating profile: " + error.message);
+    }
+};
 
         window.viewHistory = function () {
             alert("📋 Your activity history will be shown here.");
         };
 
-        window.logout = function () {
-            localStorage.clear();
-            sessionStorage.clear();
-            location.reload();
-        };
-
+       window.logout = function () {
+    localStorage.clear();
+    sessionStorage.clear();
+    document.getElementById("userProfileArea").classList.remove("show-in-mobile"); // মোবাইলের ক্লাস সরান
+    location.reload();
+};
         window.onclick = function (event) {
             if (!event.target.closest('.user-profile-area')) {
                 const dropdown = document.getElementById("profileDropdown");
