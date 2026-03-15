@@ -102,6 +102,11 @@
             margin-bottom: 8px;
         }
 
+        label i {
+            color: #c13584;
+            width: 20px;
+        }
+
         input,
         select,
         textarea {
@@ -111,6 +116,7 @@
             border-radius: 10px;
             outline: none;
             transition: 0.3s;
+            font-size: 14px;
         }
 
         textarea {
@@ -141,6 +147,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 16px;
         }
 
         .back-btn {
@@ -152,6 +159,7 @@
             padding: 15px;
             border-radius: 30px;
             font-weight: bold;
+            font-size: 16px;
         }
 
         .submit-btn:hover {
@@ -191,13 +199,57 @@
             position: relative;
         }
 
+        .bd-flag {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
         #regPhone {
             padding-left: 45px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .loading-spinner i {
+            font-size: 50px;
+            color: #c13584;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <h3>Creating your account...</h3>
+            <p>Please wait</p>
+        </div>
+    </div>
+
     <div class="reg-container">
         <div class="header">
             <h2>📚 Tutor Registration</h2>
@@ -225,9 +277,10 @@
                 <div class="form-group">
                     <label><i class="fas fa-phone"></i> Phone Number *</label>
                     <div class="phone-input-container">
-                        <input type="tel" id="regPhone" placeholder="017XXXXXXXX" required pattern="01[3-9][0-9]{8}" title="Please enter a valid Bangladeshi phone number (11 digits starting with 01)">
+                        <span class="bd-flag">🇧🇩</span>
+                        <input type="tel" id="regPhone" placeholder="017XXXXXXXX" required>
                     </div>
-                    <small class="phone-hint">Example: 01712345678 (11 digits)</small>
+                    <small>Example: 01712345678 (11 digits)</small>
                     <div class="error-message" id="phoneError">Please enter a valid Bangladeshi phone number (11 digits starting with 01)</div>
                 </div>
                 
@@ -238,7 +291,8 @@
                 
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Password *</label>
-                    <input type="password" id="regPassword" placeholder="Enter password" required>
+                    <input type="password" id="regPassword" placeholder="Enter password" required minlength="6">
+                    <small>Minimum 6 characters</small>
                 </div>
                 
                 <div class="form-group">
@@ -249,9 +303,9 @@
                     <label><i class="fas fa-venus-mars"></i> Gender</label>
                     <select id="regGender">
                         <option value="">Select Gender</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                        <option>Other</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
             </div>
@@ -288,10 +342,10 @@
                     <label><i class="fas fa-clock"></i> Preferred Time</label>
                     <select id="regTime">
                         <option value="">Select Time</option>
-                        <option>Morning</option>
-                        <option>Afternoon</option>
-                        <option>Evening</option>
-                        <option>Weekend</option>
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                        <option value="Evening">Evening</option>
+                        <option value="Weekend">Weekend</option>
                     </select>
                 </div>
             </div>
@@ -306,9 +360,9 @@
                     <label><i class="fas fa-language"></i> Medium of Instruction</label>
                     <select id="regMedium">
                         <option value="">Select Medium</option>
-                        <option>Bangla Medium</option>
-                        <option>English Medium</option>
-                        <option>Both</option>
+                        <option value="Bangla Medium">Bangla Medium</option>
+                        <option value="English Medium">English Medium</option>
+                        <option value="Both">Both</option>
                     </select>
                 </div>
                 
@@ -316,10 +370,10 @@
                     <label><i class="fas fa-users"></i> Tuition Style</label>
                     <select id="regStyle">
                         <option value="">Select Style</option>
-                        <option>Private Tuition</option>
-                        <option>Group Tuition</option>
-                        <option>Online Tuition</option>
-                        <option>All</option>
+                        <option value="Private Tuition">Private Tuition</option>
+                        <option value="Group Tuition">Group Tuition</option>
+                        <option value="Online Tuition">Online Tuition</option>
+                        <option value="All">All</option>
                     </select>
                 </div>
             </div>
@@ -346,7 +400,6 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -359,22 +412,17 @@
         };
 
         // Initialize Firebase
+        console.log("Initializing Firebase...");
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         console.log("Firebase initialized successfully");
 
-        let selectedFile = null;
         const DEFAULT_PROFILE_IMG = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
         // Phone number validation function for Bangladesh
         function validateBangladeshPhone(phone) {
-            // Remove any non-digit characters
             const cleaned = phone.replace(/\D/g, '');
-            
-            // Check if it's a valid Bangladeshi number
-            // Valid formats: 01XXXXXXXXX (11 digits starting with 01)
             const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
             return bdPhoneRegex.test(cleaned);
         }
@@ -385,12 +433,26 @@
         }
 
         // Image Preview
+        let selectedImageBase64 = null;
+        
         document.getElementById('imageInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
-                selectedFile = file;
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("File size too large! Please select an image under 5MB.");
+                    return;
+                }
+                
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    alert("Please select an image file.");
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = function (event) {
+                    selectedImageBase64 = event.target.result;
                     document.getElementById('imagePreview').src = event.target.result;
                     document.getElementById('imagePreview').style.display = 'block';
                     document.getElementById('cameraIcon').style.display = 'none';
@@ -423,39 +485,60 @@
         document.getElementById('tutorRegisterForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            console.log("Form submitted");
+            console.log("Form submitted - Starting registration process");
 
-            // Get phone number and validate
-            const phoneNumber = document.getElementById('regPhone').value;
-            
-            if (!validateBangladeshPhone(phoneNumber)) {
-                alert("❌ দয়া করে একটি বৈধ বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)");
-                document.getElementById('regPhone').focus();
-                return;
-            }
+            // Show loading overlay
+            document.getElementById('loadingOverlay').style.display = 'flex';
 
-            // Show loading state
+            // Disable submit button
             const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             submitBtn.disabled = true;
 
             try {
+                // Get phone number and validate
+                const phoneNumber = document.getElementById('regPhone').value;
+                
+                if (!validateBangladeshPhone(phoneNumber)) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    submitBtn.disabled = false;
+                    alert("❌ দয়া করে একটি বৈধ বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)");
+                    document.getElementById('regPhone').focus();
+                    return;
+                }
+
                 // Format phone number (remove non-digits)
                 const formattedPhone = formatPhoneNumber(phoneNumber);
+
+                // Get password and validate
+                const password = document.getElementById('regPassword').value;
+                if (password.length < 6) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    submitBtn.disabled = false;
+                    alert("❌ Password must be at least 6 characters long");
+                    return;
+                }
+
+                // Get email and validate
+                const email = document.getElementById('regEmail').value;
+                if (!email.includes('@') || !email.includes('.')) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    submitBtn.disabled = false;
+                    alert("❌ Please enter a valid email address");
+                    return;
+                }
 
                 // Get experience value and unit
                 const expValue = document.getElementById('regExperienceValue').value;
                 const expUnit = document.getElementById('regExperienceUnit').value;
                 const experienceText = `${expValue} ${expUnit}`;
 
-                // Get all form values
+                // Prepare form data
                 const formData = {
                     name: document.getElementById('regName').value.trim(),
-                    phone: formattedPhone, // Save formatted phone number
-                    email: document.getElementById('regEmail').value.trim(),
-                    password: document.getElementById('regPassword').value,
-                    qualification: document.getElementById('regEdu').value,
+                    phone: formattedPhone,
+                    email: email.toLowerCase().trim(),
+                    password: password,
+                    qualification: document.getElementById('regEdu').value.trim(),
                     gender: document.getElementById('regGender').value || 'Male',
                     subject: document.getElementById('regSubject').value.toLowerCase().trim(),
                     area: document.getElementById('regArea').value.toLowerCase().trim(),
@@ -467,6 +550,8 @@
                     tuitionStyle: document.getElementById('regStyle').value || 'Private Tuition',
                     nid: document.getElementById('regNid').value.trim(),
                     about: document.getElementById('regAbout').value.trim() || 'Experienced tutor dedicated to helping students achieve their academic goals.',
+                    profilePic: selectedImageBase64 || DEFAULT_PROFILE_IMG,
+                    hasCustomPhoto: selectedImageBase64 ? true : false,
                     createdAt: new Date().toISOString(),
                     userType: 'tutor',
                     role: 'tutor',
@@ -474,53 +559,20 @@
                     reviewCount: 0,
                     status: 'active',
                     country: 'Bangladesh',
-                    phoneCountry: 'BD'
+                    phoneCountry: 'BD',
+                    emailVerified: false,
+                    phoneVerified: false
                 };
 
-                console.log("Form data collected:", formData);
-
-                // Validate required fields
-                if (!formData.name || !formData.phone || !formData.email || !formData.password || !formData.qualification || !formData.subject || !formData.area || !formData.nid) {
-                    throw new Error("Please fill all required fields");
-                }
-
-                // Handle profile picture
-                let profilePicUrl = DEFAULT_PROFILE_IMG;
-
-                if (selectedFile) {
-                    try {
-                        // Convert to base64
-                        const reader = new FileReader();
-                        const base64Promise = new Promise((resolve, reject) => {
-                            reader.onload = () => resolve(reader.result);
-                            reader.onerror = reject;
-                        });
-                        reader.readAsDataURL(selectedFile);
-                        const base64Image = await base64Promise;
-                        
-                        // Upload to Firebase Storage
-                        const fileName = `tutor_${Date.now()}_${selectedFile.name}`;
-                        const storageRef = ref(storage, `tutor_profiles/${fileName}`);
-                        
-                        await uploadString(storageRef, base64Image, 'data_url');
-                        profilePicUrl = await getDownloadURL(storageRef);
-                        
-                        console.log("Profile picture uploaded successfully");
-                    } catch (uploadError) {
-                        console.error("Error uploading image:", uploadError);
-                        // Continue with default image if upload fails
-                    }
-                }
-
-                formData.profilePic = profilePicUrl;
-                formData.hasCustomPhoto = selectedFile ? true : false;
+                console.log("Saving tutor data to Firestore...");
 
                 // Save to Firestore
-                console.log("Saving to Firestore...");
                 const docRef = await addDoc(collection(db, "tutors"), formData);
-                console.log("Document written with ID: ", docRef.id);
+                
+                console.log("Tutor saved successfully with ID:", docRef.id);
 
                 // Save to localStorage for auto-login
+                localStorage.clear();
                 localStorage.setItem("userLoggedIn", "true");
                 localStorage.setItem("userType", "tutor");
                 localStorage.setItem("userDocId", docRef.id);
@@ -530,19 +582,29 @@
                 localStorage.setItem("userImg", formData.profilePic);
                 localStorage.setItem("userRole", "tutor");
 
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+
                 alert("✅ আপনার টিউটর একাউন্ট সফলভাবে তৈরি হয়েছে! আপনি এখন লগইন করেছেন।");
                 
                 // Redirect to home page
                 window.location.href = "home.html";
 
             } catch (error) {
-                console.error("Error details:", error);
-                alert("❌ একটি সমস্যা হয়েছে: " + error.message);
+                console.error("Error creating tutor account:", error);
                 
-                // Reset button
-                submitBtn.innerHTML = originalText;
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
                 submitBtn.disabled = false;
+                
+                alert("❌ একটি সমস্যা হয়েছে: " + error.message + "\n\nদয়া করে আবার চেষ্টা করুন।");
             }
+        });
+
+        // Handle any unhandled errors
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+            document.getElementById('loadingOverlay').style.display = 'none';
         });
     </script>
 </body>
