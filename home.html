@@ -50,7 +50,7 @@
             align-items: center;
             gap: 7px;
             position: relative;
-            margin-left: -30px;  /* এই লাইন যোগ করুন (যতটুকু বামে নিতে চান) */
+            margin-left: -30px;
         }
 
         /* লোগো ইমেজ */
@@ -72,6 +72,8 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            margin-left: auto;
+            order: 2;
         }
 
         .hamburger-menu:hover {
@@ -171,6 +173,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            margin-left: auto;
         }
 
         /* ন্যাভবারের লিংকগুলো (ডেস্কটপ) */
@@ -229,6 +232,7 @@
             align-items: center;
             gap: 15px;
             position: relative;
+            order: 1;
         }
 
         /* প্রোফাইল ইমেজ কন্টেইনার */
@@ -255,45 +259,69 @@
             font-size: 20px;
         }
 
-        /* ড্রপডাউন মেনু */
+        /* ড্রপডাউন মেনু - মোবাইল ও পিসির জন্য একই */
         .profile-dropdown {
             position: absolute;
             top: 55px;
             right: 0;
             background: white;
-            width: 180px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 220px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             display: none;
             flex-direction: column;
             overflow: hidden;
-            z-index: 100;
+            z-index: 1000;
+            border: 1px solid #fad1e4;
         }
 
         .profile-dropdown a,
         .profile-dropdown label {
-            padding: 12px;
-            font-size: 14px;
+            padding: 14px 18px;
+            font-size: 15px;
             color: #333;
             text-decoration: none;
             cursor: pointer;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #fde7f3;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .profile-dropdown a:hover {
-            background: #fde7f3;
+        .profile-dropdown a i,
+        .profile-dropdown label i {
+            width: 20px;
+            color: #c13584;
+            font-size: 16px;
+        }
+
+        .profile-dropdown a:hover,
+        .profile-dropdown label:hover {
+            background: linear-gradient(135deg, #fde7f3, #fff0f8);
+            padding-left: 25px;
+        }
+
+        .profile-dropdown a:last-child {
+            border-bottom: none;
+            color: #ff4444;
+        }
+
+        .profile-dropdown a:last-child i {
+            color: #ff4444;
         }
 
         /* ইউজার রোল ব্যাজ */
         .user-role-badge {
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
         }
 
         /* ========== হিরো সেকশন ========== */
@@ -1587,31 +1615,71 @@
                 gap: 20px;
             }
         }
-@media (max-width: 768px) {
-    nav {
-        padding: 0 20px;
-        position: relative;
-        z-index: 20;
-    }
 
-    /* ডেস্কটপ লিংক লুকানো */
-    .nav-links,
-    .auth-links {
-        display: none !important;
-    }
-    
-    /* মোবাইলে প্রোফাইল এরিয়া শুধু তখনই দেখাবে যখন লগইন করা থাকবে */
-    .user-profile-area {
-        display: none !important; /* পরিবর্তন: ডিফল্টভাবে লুকানো থাকবে */
-    }
-    
-    /* যখন লগইন করা থাকবে তখন jQuery/JavaScript দিয়ে show করা হবে */
-    .user-profile-area.show-in-mobile {
-        display: flex !important;
-    }       
-            /* হ্যামবার্গার মেনু দেখানো */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 15px;
+                position: relative;
+                z-index: 20;
+            }
+
+            /* ডেস্কটপ লিংক লুকানো */
+            .nav-links,
+            .auth-links {
+                display: none !important;
+            }
+            
+            /* ন্যাভবারের ডান অংশ */
+            .nav-right {
+                gap: 8px;
+                margin-left: auto;
+            }
+            
+            /* মোবাইলে প্রোফাইল এরিয়া */
+            .user-profile-area {
+                display: none !important;
+                gap: 8px;
+            }
+            
+            .user-profile-area.show-in-mobile {
+                display: flex !important;
+            }
+            
+            /* প্রোফাইল ইমেজ ছোট */
+            .profile-img-container {
+                width: 38px;
+                height: 38px;
+            }
+            
+            /* থ্রি ডট মেনু */
+            .menu-dots {
+                font-size: 18px;
+            }
+            
+            /* ইউজার রোল ব্যাজ মোবাইলে ছোট */
+            .user-role-badge {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            
+            /* হ্যামবার্গার মেনু দেখানো - ডান পাশে */
             .hamburger-menu {
                 display: flex;
+                order: 2;
+                margin-left: 5px;
+            }
+            
+            /* ড্রপডাউন মোবাইলেও একই থাকবে */
+            .profile-dropdown {
+                position: absolute;
+                top: 50px;
+                right: 0;
+                left: auto;
+                width: 220px;
+                max-width: none;
+                bottom: auto;
+                margin: 0;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
             }
 
             .hero h1 {
@@ -1685,18 +1753,6 @@
                 padding-left: 0;
                 justify-content: center;
             }
-            
-            /* মোবাইলে প্রোফাইল ড্রপডাউন ঠিকভাবে দেখানো */
-            .profile-dropdown {
-                position: fixed;
-                top: auto;
-                bottom: 20px;
-                left: 20px;
-                right: 20px;
-                width: auto;
-                max-width: 300px;
-                margin: 0 auto;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1708,14 +1764,14 @@
                 font-size: 20px;
             }
             
-            /* মোবাইলে প্রোফাইল এরিয়া ছোট আকারে */
+            /* অতি ছোট স্ক্রিনে */
             .user-profile-area {
-                gap: 8px;
+                gap: 5px;
             }
             
             .profile-img-container {
-                width: 40px;
-                height: 40px;
+                width: 35px;
+                height: 35px;
             }
             
             .menu-dots {
@@ -1723,8 +1779,12 @@
             }
             
             .user-role-badge {
-                font-size: 10px;
-                padding: 3px 6px;
+                display: none !important;
+            }
+            
+            .profile-dropdown {
+                width: 200px;
+                right: 0;
             }
         }
     </style>
@@ -1736,11 +1796,6 @@
     <nav>
         <div class="logo-container">
             <img src="logo.png" alt="Logo" class="logo-img">
-        </div>
-
-        <!-- হ্যামবার্গার আইকন -->
-        <div class="hamburger-menu" onclick="openMobileMenu()">
-            <i class="fas fa-bars"></i>
         </div>
 
         <div class="nav-right">
@@ -1762,12 +1817,17 @@
                 <i class="fas fa-ellipsis-v menu-dots" onclick="toggleDropdown()"></i>
 
                 <div class="profile-dropdown" id="profileDropdown">
-                    <label for="imgInput">Change Photo</label>
+                    <label for="imgInput"><i class="fas fa-camera"></i> Change Photo</label>
                     <input type="file" id="imgInput" style="display:none" accept="image/*">
-                    <a href="javascript:void(0)" onclick="openEditProfile()">Edit Info</a>
-                    <a href="javascript:void(0)" onclick="viewHistory()">History</a>
-                    <a href="javascript:void(0)" onclick="logout()">Logout</a>
+                    <a href="javascript:void(0)" onclick="openEditProfile()"><i class="fas fa-user-edit"></i> Edit Info</a>
+                    <a href="javascript:void(0)" onclick="viewHistory()"><i class="fas fa-history"></i> History</a>
+                    <a href="javascript:void(0)" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
+            </div>
+
+            <!-- হ্যামবার্গার আইকন - ডান পাশে -->
+            <div class="hamburger-menu" onclick="openMobileMenu()">
+                <i class="fas fa-bars"></i>
             </div>
         </div>
     </nav>
@@ -2928,47 +2988,47 @@
         };
 
         window.checkLogin = async function () {
-    if (localStorage.getItem("userLoggedIn") === "true") {
-        document.getElementById("authLinks").style.display = "none";
-        document.getElementById("userProfileArea").style.display = "flex";
-        
-        // মোবাইলের জন্য ক্লাস যোগ করুন
-        document.getElementById("userProfileArea").classList.add("show-in-mobile");
+            if (localStorage.getItem("userLoggedIn") === "true") {
+                document.getElementById("authLinks").style.display = "none";
+                document.getElementById("userProfileArea").style.display = "flex";
+                
+                // মোবাইলের জন্য ক্লাস যোগ করুন
+                document.getElementById("userProfileArea").classList.add("show-in-mobile");
 
-        currentUserType = localStorage.getItem("userType") || "user";
-        currentUserRole = localStorage.getItem("userRole");
-        currentUserName = localStorage.getItem("userName");
-        currentUserImg = localStorage.getItem("userImg");
+                currentUserType = localStorage.getItem("userType") || "user";
+                currentUserRole = localStorage.getItem("userRole");
+                currentUserName = localStorage.getItem("userName");
+                currentUserImg = localStorage.getItem("userImg");
 
-        const roleBadge = document.getElementById("userRoleDisplay");
-        if (currentUserType === "tutor") {
-            roleBadge.textContent = "👨‍🏫 Tutor";
-            roleBadge.style.display = "inline-block";
-        } else {
-            roleBadge.textContent = currentUserRole === "student" ? "👨‍🎓 Student" :
-                currentUserRole === "guardian" ? "👪 Guardian" : "👤 User";
-            roleBadge.style.display = "inline-block";
-        }
+                const roleBadge = document.getElementById("userRoleDisplay");
+                if (currentUserType === "tutor") {
+                    roleBadge.textContent = "👨‍🏫 Tutor";
+                    roleBadge.style.display = "inline-block";
+                } else {
+                    roleBadge.textContent = currentUserRole === "student" ? "👨‍🎓 Student" :
+                        currentUserRole === "guardian" ? "👪 Guardian" : "👤 User";
+                    roleBadge.style.display = "inline-block";
+                }
 
-        const savedImg = localStorage.getItem("userImg");
-        if (savedImg) {
-            document.getElementById("displayPic").src = savedImg;
-        }
+                const savedImg = localStorage.getItem("userImg");
+                if (savedImg) {
+                    document.getElementById("displayPic").src = savedImg;
+                }
 
-        const userEmail = localStorage.getItem("userEmail");
-        const userDocId = localStorage.getItem("userDocId");
-        if (userDocId) {
-            currentUserDocId = userDocId;
-            currentUserEmail = userEmail;
-        } else if (userEmail) {
-            await loadUserData(userEmail, currentUserType);
-        }
-    } else {
-        document.getElementById("authLinks").style.display = "flex";
-        document.getElementById("userProfileArea").style.display = "none";
-        document.getElementById("userProfileArea").classList.remove("show-in-mobile"); // মোবাইলের ক্লাস সরান
-    }
-};
+                const userEmail = localStorage.getItem("userEmail");
+                const userDocId = localStorage.getItem("userDocId");
+                if (userDocId) {
+                    currentUserDocId = userDocId;
+                    currentUserEmail = userEmail;
+                } else if (userEmail) {
+                    await loadUserData(userEmail, currentUserType);
+                }
+            } else {
+                document.getElementById("authLinks").style.display = "flex";
+                document.getElementById("userProfileArea").style.display = "none";
+                document.getElementById("userProfileArea").classList.remove("show-in-mobile");
+            }
+        };
 
         async function loadUserData(email, type) {
             try {
@@ -3093,88 +3153,89 @@
             reader.readAsDataURL(e.target.files[0]);
         });
 
-      window.saveProfileChanges = async function () {
-    if (!currentUserDocId) {
-        alert("User not found!");
-        return;
-    }
+        window.saveProfileChanges = async function () {
+            if (!currentUserDocId) {
+                alert("User not found!");
+                return;
+            }
 
-    let updatedData = {
-        name: document.getElementById("editName").value,
-        phone: document.getElementById("editPhone").value,
-        email: document.getElementById("editEmail").value,
-        profilePic: document.getElementById("editProfilePic").src
-    };
+            let updatedData = {
+                name: document.getElementById("editName").value,
+                phone: document.getElementById("editPhone").value,
+                email: document.getElementById("editEmail").value,
+                profilePic: document.getElementById("editProfilePic").src
+            };
 
-    if (currentUserType === "tutor") {
-        updatedData = {
-            ...updatedData,
-            qualification: document.getElementById("editEdu").value,
-            subject: document.getElementById("editSubject").value.toLowerCase(),
-            area: document.getElementById("editArea").value.toLowerCase(),
-            experience: document.getElementById("editExperience").value,
-            salary: document.getElementById("editSalary").value,
-            preferredClass: document.getElementById("editClass").value,
-            nid: document.getElementById("editNid").value
+            if (currentUserType === "tutor") {
+                updatedData = {
+                    ...updatedData,
+                    qualification: document.getElementById("editEdu").value,
+                    subject: document.getElementById("editSubject").value.toLowerCase(),
+                    area: document.getElementById("editArea").value.toLowerCase(),
+                    experience: document.getElementById("editExperience").value,
+                    salary: document.getElementById("editSalary").value,
+                    preferredClass: document.getElementById("editClass").value,
+                    nid: document.getElementById("editNid").value
+                };
+            } else {
+                updatedData = {
+                    ...updatedData,
+                    role: document.getElementById("editRole").value
+                };
+            }
+
+            try {
+                let collectionName = currentUserType === "tutor" ? "tutors" : "users";
+                const userRef = doc(db, collectionName, currentUserDocId);
+                await updateDoc(userRef, updatedData);
+
+                localStorage.setItem("userName", updatedData.name);
+                localStorage.setItem("userPhone", updatedData.phone);
+                localStorage.setItem("userEmail", updatedData.email);
+                localStorage.setItem("userImg", updatedData.profilePic);
+
+                currentUserName = updatedData.name;
+                currentUserImg = updatedData.profilePic;
+
+                if (currentUserType === "tutor") {
+                    localStorage.setItem("userEdu", updatedData.qualification);
+                    localStorage.setItem("userSubject", updatedData.subject);
+                    localStorage.setItem("userArea", updatedData.area);
+                    localStorage.setItem("userExperience", updatedData.experience);
+                    localStorage.setItem("userSalary", updatedData.salary);
+                    localStorage.setItem("userClass", updatedData.preferredClass);
+                    localStorage.setItem("userNid", updatedData.nid);
+                } else {
+                    localStorage.setItem("userRole", updatedData.role);
+                    document.getElementById("userRoleDisplay").textContent = updatedData.role === "student" ? "👨‍🎓 Student" :
+                        updatedData.role === "guardian" ? "👪 Guardian" : "👤 User";
+                }
+
+                document.getElementById("displayPic").src = updatedData.profilePic;
+                
+                // মোবাইলের জন্য ক্লাস নিশ্চিত করুন
+                document.getElementById("userProfileArea").classList.add("show-in-mobile");
+                
+                alert("Profile updated successfully!");
+                closeEditProfile();
+                loadPopularTutors();
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                alert("Error updating profile: " + error.message);
+            }
         };
-    } else {
-        updatedData = {
-            ...updatedData,
-            role: document.getElementById("editRole").value
-        };
-    }
-
-    try {
-        let collectionName = currentUserType === "tutor" ? "tutors" : "users";
-        const userRef = doc(db, collectionName, currentUserDocId);
-        await updateDoc(userRef, updatedData);
-
-        localStorage.setItem("userName", updatedData.name);
-        localStorage.setItem("userPhone", updatedData.phone);
-        localStorage.setItem("userEmail", updatedData.email);
-        localStorage.setItem("userImg", updatedData.profilePic);
-
-        currentUserName = updatedData.name;
-        currentUserImg = updatedData.profilePic;
-
-        if (currentUserType === "tutor") {
-            localStorage.setItem("userEdu", updatedData.qualification);
-            localStorage.setItem("userSubject", updatedData.subject);
-            localStorage.setItem("userArea", updatedData.area);
-            localStorage.setItem("userExperience", updatedData.experience);
-            localStorage.setItem("userSalary", updatedData.salary);
-            localStorage.setItem("userClass", updatedData.preferredClass);
-            localStorage.setItem("userNid", updatedData.nid);
-        } else {
-            localStorage.setItem("userRole", updatedData.role);
-            document.getElementById("userRoleDisplay").textContent = updatedData.role === "student" ? "👨‍🎓 Student" :
-                updatedData.role === "guardian" ? "👪 Guardian" : "👤 User";
-        }
-
-        document.getElementById("displayPic").src = updatedData.profilePic;
-        
-        // মোবাইলের জন্য ক্লাস নিশ্চিত করুন
-        document.getElementById("userProfileArea").classList.add("show-in-mobile");
-        
-        alert("Profile updated successfully!");
-        closeEditProfile();
-        loadPopularTutors();
-    } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Error updating profile: " + error.message);
-    }
-};
 
         window.viewHistory = function () {
             alert("📋 Your activity history will be shown here.");
         };
 
-       window.logout = function () {
-    localStorage.clear();
-    sessionStorage.clear();
-    document.getElementById("userProfileArea").classList.remove("show-in-mobile"); // মোবাইলের ক্লাস সরান
-    location.reload();
-};
+        window.logout = function () {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.getElementById("userProfileArea").classList.remove("show-in-mobile");
+            location.reload();
+        };
+
         window.onclick = function (event) {
             if (!event.target.closest('.user-profile-area')) {
                 const dropdown = document.getElementById("profileDropdown");
