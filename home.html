@@ -1755,6 +1755,48 @@
                 justify-content: center;
             }
         }
+        /* Footer social icons - original brand colors on hover */
+.footer-social a {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.footer-social a:hover {
+    transform: translateY(-5px) scale(1.1);
+}
+
+.footer-social a.facebook:hover {
+    background: #1877f2;
+    color: white;
+}
+
+.footer-social a.whatsapp:hover {
+    background: #25d366;
+    color: white;
+}
+
+.footer-social a.linkedin:hover {
+    background: #0077b5;
+    color: white;
+}
+
+.footer-social a.youtube:hover {
+    background: #ff0000;
+    color: white;
+}
+
+.footer-social a.instagram:hover {
+    background: radial-gradient(circle at 30% 110%, #ffdb7e, #f9ce34, #e4405f, #833ab4, #5851db);
+    color: white;
+}
 
         @media (max-width: 480px) {
             .hero h1 {
@@ -2257,7 +2299,7 @@
                     <a href="#" class="facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="whatsapp" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     <a href="#" class="linkedin" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="youtube" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                   
                     <a href="#" class="instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
