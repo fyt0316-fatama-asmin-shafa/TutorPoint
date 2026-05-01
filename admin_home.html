@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TutorPoint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #fde7f3 0%, #fff0f8 100%);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR STYLES ========== */
+        nav {
+            height: 75px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0 40px;
+            z-index: 10;
+            background: linear-gradient(90deg,
+                    rgba(228, 191, 208, 0.95),
+                    rgba(211, 112, 168, 0.95),
+                    rgba(155, 38, 91, 0.95));
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 20px rgba(193, 53, 132, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            position: relative;
+            margin-left: -25px;
+        }
+
+        .logo-img {
+            width: 150px;
+            height: auto;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+        }
+
+        .admin-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .admin-badge i {
+            margin-right: 8px;
+            color: #ffd700;
+        }
+
+        .logout-btn {
+            background: #ffffff;
+            color: #c13584;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logout-btn:hover {
+            background: #fde7f3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(193, 53, 132, 0.4);
+        }
+
+        .container {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(193, 53, 132, 0.1);
+            border: 1px solid #fad1e4;
+        }
+
+        .welcome-section h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #8e164d;
+        }
+
+        .welcome-section h1 i {
+            color: #c13584;
+        }
+
+        .welcome-section p {
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #fad1e4;
+            box-shadow: 0 10px 20px rgba(193, 53, 132, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-bottom: 3px solid #c13584;
+            box-shadow: 0 15px 30px rgba(193, 53, 132, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #c13584;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #8e164d;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .section-title {
+            color: #8e164d;
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #c13584;
+        }
+
+        .section-title a {
+            color: #c13584;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .section-title a:hover {
+            color: #8e164d;
+            transform: translateX(5px);
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 20px rgba(193, 53, 132, 0.1);
+            border: 1px solid #fad1e4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #fde7f3;
+        }
+
+        tr:hover {
+            background: #fff0f8;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 0 3px;
+            transition: 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(193, 53, 132, 0.3);
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #6c5ce7, #a363d9);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .post-form {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(193, 53, 132, 0.1);
+            border: 1px solid #fad1e4;
+        }
+
+        .post-form h3 {
+            color: #8e164d;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .post-form h3 i {
+            color: #c13584;
+            margin-right: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .form-group label i {
+            color: #c13584;
+            margin-right: 5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #fad1e4;
+            border-radius: 10px;
+            background: #fff9fc;
+            color: #333;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #c13584;
+            box-shadow: 0 0 5px rgba(193, 53, 132, 0.2);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #999;
+        }
+
+        .form-group select option {
+            background: white;
+            color: #333;
+        }
+
+        .submit-post-btn {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(193, 53, 132, 0.3);
+        }
+
+        .submit-post-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(193, 53, 132, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 40px;
+            color: #c13584;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 20px;
+            }
+            
+            .logo-img {
+                width: 120px;
+            }
+            
+            .admin-badge {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            td, th {
+                padding: 10px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo-container">
+            <img src="logo.png" alt="TutorPoint" class="logo-img">
+        </div>
+        <div class="admin-info">
+            <span class="admin-badge"><i class="fas fa-user-shield"></i> Admin</span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1><i class="fas fa-crown" style="color: #c13584;"></i> Admin Dashboard</h1>
+            <p>Welcome back! Manage all tutor requests, applications, and tuition posts from here.</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card" onclick="window.location.href='admin_contact_requests.html'">
+                <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                <div class="stat-number" id="contactCount">0</div>
+                <div class="stat-label">Contact Requests</div>
+            </div>
+            <div class="stat-card" onclick="window.location.href='admin_applications.html'">
+                <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+                <div class="stat-number" id="applicationCount">0</div>
+                <div class="stat-label">Tuition Applications</div>
+            </div>
+            <div class="stat-card" onclick="window.location.href='admin_tuition_posts.html'">
+                <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
+                <div class="stat-number" id="postCount">0</div>
+                <div class="stat-label">Active Tuition Posts</div>
+            </div>
+        </div>
+
+        <!-- Create New Tuition Post Section -->
+        <div class="post-form" id="postForm">
+            <h3><i class="fas fa-plus-circle"></i> Create New Tuition Post</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Post ID *</label>
+                    <input type="text" id="postId" placeholder="e.g. DHK-2024-001" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-graduation-cap"></i> Class *</label>
+                    <input type="text" id="postClass" placeholder="e.g. 6, 7, 8, 9, 10" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-globe"></i> Medium *</label>
+                    <select id="postMedium" required>
+                        <option value="">Select Medium</option>
+                        <option value="Bangla">Bangla Medium</option>
+                        <option value="English">English Medium</option>
+                        <option value="Both">Both</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Location *</label>
+                    <input type="text" id="postLocation" placeholder="e.g. Mirpur, Dhaka" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Subjects *</label>
+                    <input type="text" id="postSubjects" placeholder="e.g. Math, Physics, English" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-money-bill-wave"></i> Salary (Tk) *</label>
+                    <input type="number" id="postSalary" placeholder="e.g. 5000" required>
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label><i class="fas fa-info-circle"></i> Additional Details (Optional)</label>
+                    <textarea id="postDetails" rows="3" placeholder="Any special requirements..."></textarea>
+                </div>
+            </div>
+            <button class="submit-post-btn" onclick="createTuitionPost()"><i class="fas fa-paper-plane"></i> Publish Post</button>
+        </div>
+
+        <!-- Recent Contact Requests -->
+        <div class="section-title">
+            <i class="fas fa-envelope"></i> Recent Contact Requests
+            <a href="admin_contact_requests.html">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="data-table" id="recentContactsTable">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading contact requests...</p>
+            </div>
+        </div>
+
+        <!-- Recent Tuition Applications -->
+        <div class="section-title">
+            <i class="fas fa-file-signature"></i> Recent Tuition Applications
+            <a href="admin_applications.html">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="data-table" id="recentApplicationsTable">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading applications...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp, deleteDoc, doc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+            authDomain: "medialert-a04d5.firebaseapp.com",
+            projectId: "medialert-a04d5",
+            storageBucket: "medialert-a04d5.firebasestorage.app",
+            messagingSenderId: "267657249954",
+            appId: "1:267657249954:web:01165929839cb83e7e03fb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Check if user is admin
+        const userEmail = localStorage.getItem("userEmail");
+        const userType = localStorage.getItem("userType");
+
+        if (!userEmail || userEmail !== "tutorpointwebproject@gmail.com" || userType !== "admin") {
+            alert("Access denied! Admin only.");
+            window.location.href = "login.html";
+        }
+
+        // Logout function
+        window.logout = function() {
+            localStorage.clear();
+            window.location.href = "login.html";
+        };
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                // Contact requests count
+                const contactsRef = collection(db, "teacherContactRequests");
+                const contactsSnapshot = await getDocs(contactsRef);
+                document.getElementById("contactCount").textContent = contactsSnapshot.size;
+
+                // Applications count
+                const appsRef = collection(db, "applications");
+                const appsSnapshot = await getDocs(appsRef);
+                document.getElementById("applicationCount").textContent = appsSnapshot.size;
+
+                // Tuition posts count
+                const postsRef = collection(db, "tuitionPosts");
+                const postsSnapshot = await getDocs(postsRef);
+                document.getElementById("postCount").textContent = postsSnapshot.size;
+
+            } catch (error) {
+                console.error("Error loading statistics:", error);
+            }
+        }
+
+        // Load recent contact requests
+        async function loadRecentContacts() {
+            try {
+                const contactsRef = collection(db, "teacherContactRequests");
+                const q = query(contactsRef, orderBy("createdAt", "desc"), limit(5));
+                const snapshot = await getDocs(q);
+                
+                const tableContainer = document.getElementById("recentContactsTable");
+                
+                if (snapshot.empty) {
+                    tableContainer.innerHTML = '<div class="empty-message">No contact requests yet.</div>';
+                    return;
+                }
+
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Tutor</th>
+                                <th>Area</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    html += `
+                        <tr>
+                            <td>${data.studentName || 'N/A'}</td>
+                            <td>${data.tutorName || 'N/A'}</td>
+                            <td>${data.area || 'N/A'}</td>
+                            <td>${data.phone || 'N/A'}</td>
+                            <td><span class="status-badge status-${data.status || 'pending'}">${data.status || 'pending'}</span></td>
+                            <td>
+                                <button class="action-btn" onclick="viewContactDetails('${doc.id}')"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn" onclick="updateContactStatus('${doc.id}', 'approved')"><i class="fas fa-check"></i></button>
+                                <button class="action-btn" onclick="updateContactStatus('${doc.id}', 'rejected')"><i class="fas fa-times"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                tableContainer.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error loading contacts:", error);
+                document.getElementById("recentContactsTable").innerHTML = '<div class="empty-message">Error loading data.</div>';
+            }
+        }
+
+        // Load recent applications
+        async function loadRecentApplications() {
+            try {
+                const appsRef = collection(db, "applications");
+                const q = query(appsRef, orderBy("appliedAt", "desc"), limit(5));
+                const snapshot = await getDocs(q);
+                
+                const tableContainer = document.getElementById("recentApplicationsTable");
+                
+                if (snapshot.empty) {
+                    tableContainer.innerHTML = '<div class="empty-message">No applications yet.</div>';
+                    return;
+                }
+
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tutor</th>
+                                <th>Post ID</th>
+                                <th>Class</th>
+                                <th>Location</th>
+                                <th>Salary</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    html += `
+                        <tr>
+                            <td>${data.tutorName || 'N/A'}</td>
+                            <td>${data.postId || 'N/A'}</td>
+                            <td>${data.postDetails?.classNum || 'N/A'}</td>
+                            <td>${data.postDetails?.location || 'N/A'}</td>
+                            <td>৳ ${data.postDetails?.salary || 'N/A'}</td>
+                            <td><span class="status-badge status-${data.status || 'pending'}">${data.status || 'pending'}</span></td>
+                            <td>
+                                <button class="action-btn view-btn" onclick="viewApplicationDetails('${doc.id}')"><i class="fas fa-eye"></i> View</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                tableContainer.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error loading applications:", error);
+                document.getElementById("recentApplicationsTable").innerHTML = '<div class="empty-message">Error loading data.</div>';
+            }
+        }
+
+        // Create new tuition post
+        window.createTuitionPost = async function() {
+            const postId = document.getElementById("postId").value;
+            const postClass = document.getElementById("postClass").value;
+            const postMedium = document.getElementById("postMedium").value;
+            const postLocation = document.getElementById("postLocation").value;
+            const postSubjects = document.getElementById("postSubjects").value;
+            const postSalary = document.getElementById("postSalary").value;
+            const postDetails = document.getElementById("postDetails").value;
+
+            // Validation
+            if (!postId || !postClass || !postMedium || !postLocation || !postSubjects || !postSalary) {
+                alert("Please fill all required fields!");
+                return;
+            }
+
+            const subjectsArray = postSubjects.split(',').map(s => s.trim());
+
+            const postData = {
+                id: postId,
+                classNum: postClass,
+                medium: postMedium,
+                location: postLocation,
+                subjects: subjectsArray,
+                salary: parseInt(postSalary),
+                details: postDetails || '',
+                createdBy: 'admin',
+                createdAt: serverTimestamp(),
+                status: 'active'
+            };
+
+            try {
+                const submitBtn = event.target;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+
+                await addDoc(collection(db, "tuitionPosts"), postData);
+                
+                alert("✅ Tuition post created successfully!");
+                
+                // Clear form
+                document.getElementById("postId").value = '';
+                document.getElementById("postClass").value = '';
+                document.getElementById("postMedium").value = '';
+                document.getElementById("postLocation").value = '';
+                document.getElementById("postSubjects").value = '';
+                document.getElementById("postSalary").value = '';
+                document.getElementById("postDetails").value = '';
+
+                // Refresh post count
+                loadStatistics();
+
+            } catch (error) {
+                console.error("Error creating post:", error);
+                alert("❌ Error creating post: " + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish Post';
+            }
+        };
+
+        // View contact details
+        window.viewContactDetails = function(docId) {
+            window.location.href = `admin_contact_requests.html?id=${docId}`;
+        };
+
+        // Update contact status
+        window.updateContactStatus = async function(docId, status) {
+            try {
+                await updateDoc(doc(db, "teacherContactRequests", docId), {
+                    status: status,
+                    updatedAt: serverTimestamp()
+                });
+                alert(`✅ Request ${status}!`);
+                loadRecentContacts();
+                loadStatistics();
+            } catch (error) {
+                console.error("Error updating status:", error);
+                alert("❌ Error updating status.");
+            }
+        };
+
+        // View application details
+        window.viewApplicationDetails = function(docId) {
+            window.location.href = `admin_applications.html?id=${docId}`;
+        };
+
+        // Initialize
+        loadStatistics();
+        loadRecentContacts();
+        loadRecentApplications();
+
+    </script>
+
+    <script>
+        // Non-module functions
+        window.logout = function() {
+            localStorage.clear();
+            window.location.href = "login.html";
+        };
+    </script>
+</body>
+
+</html>

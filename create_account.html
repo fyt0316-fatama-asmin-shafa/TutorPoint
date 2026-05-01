@@ -101,7 +101,6 @@
             width: 20px;
         }
 
-        /* সব ইনপুটের জন্য সাধারণ স্টাইল */
         input,
         select {
             width: 100%;
@@ -120,7 +119,6 @@
             box-shadow: 0 0 5px rgba(193, 53, 132, 0.2);
         }
 
-        /* ফোন ইনপুটের জন্য স্পেশাল স্টাইল - এখন বর্ডার দেখা যাবে */
         .phone-input-container {
             position: relative;
             width: 100%;
@@ -150,16 +148,6 @@
         #phone:focus {
             border-color: #c13584;
             box-shadow: 0 0 5px rgba(193, 53, 132, 0.2);
-        }
-
-        /* যখন ভুল ফোন নম্বর দেয় */
-        #phone.error {
-            border-color: #dc3545;
-        }
-
-        /* যখন সঠিক ফোন নম্বর দেয় */
-        #phone.valid {
-            border-color: #28a745;
         }
 
         .btn-container {
@@ -250,7 +238,6 @@
             margin-bottom: 15px;
         }
 
-        /* মোবাইলের জন্য রেস্পন্সিভ */
         @media (max-width: 480px) {
             .reg-container {
                 padding: 25px;
@@ -363,14 +350,11 @@
         console.log("Firebase initialized successfully");
 
         const DEFAULT_PROFILE_IMG = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+        const ADMIN_EMAIL = "tutorpointwebproject@gmail.com";
 
         // Phone number validation function for Bangladesh
         function validateBangladeshPhone(phone) {
-            // Remove any non-digit characters
             const cleaned = phone.replace(/\D/g, '');
-            
-            // Check if it's a valid Bangladeshi number
-            // Valid formats: 01XXXXXXXXX (11 digits starting with 01)
             const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
             return bdPhoneRegex.test(cleaned);
         }
@@ -387,13 +371,11 @@
         document.getElementById('imageInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
-                // Check file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     alert("File size too large! Please select an image under 5MB.");
                     return;
                 }
                 
-                // Check file type
                 if (!file.type.startsWith('image/')) {
                     alert("Please select an image file.");
                     return;
@@ -436,6 +418,15 @@
             e.preventDefault();
 
             console.log("Form submitted");
+
+            // Check if trying to create admin account
+            const email = document.getElementById('email').value.toLowerCase().trim();
+            
+            if (email === ADMIN_EMAIL) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert("❌Please use a different email address.");
+                return;
+            }
 
             // Show loading overlay
             document.getElementById('loadingOverlay').style.display = 'flex';

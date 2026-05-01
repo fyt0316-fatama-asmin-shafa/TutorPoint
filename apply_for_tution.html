@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tuition Apply</title>
+<title>Tuition Apply - TutorPoint</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -163,7 +163,7 @@ width:250px;
 <script type="module">
 // ========== FIREBASE IMPORTS ==========
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ========== FIREBASE CONFIG ==========
 const firebaseConfig = {
@@ -185,115 +185,37 @@ const userDocId = localStorage.getItem("userDocId");
 const userEmail = localStorage.getItem("userEmail");
 const userName = localStorage.getItem("userName");
 
-let appliedPostIds = new Set(); // Store applied post IDs
+let appliedPostIds = new Set();
 let tuitionData = [];
 let currentPostId = null;
-let applications = []; // Store full application data
+let applications = [];
 
-// ========== SAMPLE DATA (IF FIRESTORE EMPTY) ==========
-const sampleData = [
-{
-id:"RMP-1001",
-classNum:"6",
-medium:"Bangla",
-location:"Rampura",
-subjects:["Math"]
-},
-{
-id:"UTR-1002",
-classNum:"8",
-medium:"English",
-location:"Uttara",
-subjects:["Math","English","Science"]
-},
-{
-id:"GLS-1003",
-classNum:"9",
-medium:"English",
-location:"Gulshan",
-subjects:["Physics","Chemistry"]
-},
-{
-id:"DHM-1004",
-classNum:"10",
-medium:"Bangla",
-location:"Dhanmondi",
-subjects:["Math","Higher Math","ICT","Physics"]
-},
-{
-id:"MRP-1005",
-classNum:"7",
-medium:"Bangla",
-location:"Mirpur",
-subjects:["English"]
-},
-{
-id:"BDD-1006",
-classNum:"6",
-medium:"English",
-location:"Badda",
-subjects:["Math","English"]
-},
-{
-id:"BAN-1007",
-classNum:"9",
-medium:"English",
-location:"Banani",
-subjects:["Physics","Chemistry","Biology"]
-},
-{
-id:"MHK-1008",
-classNum:"10",
-medium:"Bangla",
-location:"Mohakhali",
-subjects:["Math","ICT"]
-},
-{
-id:"WAR-1009",
-classNum:"8",
-medium:"Bangla",
-location:"Wari",
-subjects:["Math"]
-},
-{
-id:"MTJ-1010",
-classNum:"7",
-medium:"English",
-location:"Motijheel",
-subjects:["English","Math","Science"]
-}
-];
-
-// ========== LOAD TUITION POSTS ==========
-async function loadTuitionPosts() {
-    try {
-        const postsRef = collection(db, "tuitionPosts");
-        const q = query(postsRef, orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+// ========== SETUP REAL-TIME POSTS LISTENER ==========
+function setupPostsListener() {
+    const postsRef = collection(db, "tuitionPosts");
+    const q = query(postsRef, orderBy("createdAt", "desc"));
+    
+    // Real-time listener for posts
+    onSnapshot(q, (snapshot) => {
+        console.log("Posts updated in real-time:", snapshot.size);
         
-        if (!snapshot.empty) {
-            tuitionData = [];
-            snapshot.forEach(doc => {
-                tuitionData.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
+        tuitionData = [];
+        snapshot.forEach(doc => {
+            tuitionData.push({
+                id: doc.id,
+                ...doc.data()
             });
-        } else {
-            tuitionData = sampleData;
-        }
+        });
         
-        // Load applications for this tutor
+        // After posts update, reload applications for this tutor
         if (isLoggedIn && userType === "tutor") {
-            await loadApplications();
+            loadApplications();
         } else {
             render();
         }
-    } catch (error) {
-        console.error("Error loading posts:", error);
-        tuitionData = sampleData;
-        render();
-    }
+    }, (error) => {
+        console.error("Error in posts listener:", error);
+    });
 }
 
 // ========== LOAD APPLICATIONS FROM FIRESTORE ==========
@@ -400,6 +322,11 @@ function render() {
         return;
     }
     
+    if (tuitionData.length === 0) {
+        grid.innerHTML = "<p style='text-align:center; padding:3rem; color:#666;'>No tuition posts available yet. Check back later.</p>";
+        return;
+    }
+    
     grid.innerHTML = tuitionData.map((item) => {
         const isApplied = appliedPostIds.has(item.id);
         const salary = item.salary || calculateSalary(item.subjects);
@@ -466,7 +393,7 @@ function renderDashboard() {
     const dashboard = document.getElementById("dashboard");
     
     if (!isLoggedIn || userType !== "tutor" || applications.length === 0) {
-        dashboard.innerHTML = "";
+        dashboard.innerHTML = "<p style='text-align:center; padding:2rem; color:#666;'>No applications yet.</p>";
         return;
     }
     
@@ -475,7 +402,7 @@ function renderDashboard() {
         if (!post) return '';
         
         const salary = post.salary || calculateSalary(post.subjects);
-        const appliedDate = app.appliedAt ? new Date(app.appliedAt.toDate()).toLocaleDateString() : 'Recently';
+        const appliedDate = app.appliedAt ? new Date(app.appliedAt.toDate()).toLocaleDateString('bn-BD') : 'Recently';
         
         return `
         <div class="dashboard-card">
@@ -591,6 +518,9 @@ document.addEventListener("click", async (e) => {
                 render();
                 renderDashboard();
                 
+                // Show success message
+                alert("Application removed successfully!");
+                
             } catch (error) {
                 console.error("Error removing application:", error);
                 alert("Error removing application. Please try again.");
@@ -625,7 +555,8 @@ document.getElementById("p2").onclick = () => {
 };
 
 // ========== INITIALIZE ==========
-loadTuitionPosts();
+// Start real-time listener for posts
+setupPostsListener();
 
 // Close popup when clicking outside
 document.getElementById("popup").addEventListener("click", (e) => {

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Requests - Admin | TutorPoint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #fde7f3 0%, #fff0f8 100%);
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 75px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            background: linear-gradient(90deg, rgba(228, 191, 208, 0.95), rgba(211, 112, 168, 0.95), rgba(155, 38, 91, 0.95));
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 20px rgba(193, 53, 132, 0.3);
+        }
+
+        .logo-img {
+            width: 150px;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+        }
+
+        .admin-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+
+        .back-btn,
+        .logout-btn,
+        .refresh-btn {
+            background: white;
+            color: #c13584;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover,
+        .logout-btn:hover,
+        .refresh-btn:hover {
+            background: #fde7f3;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            color: #8e164d;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid #fad1e4;
+            background: white;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 10px 20px rgba(193, 53, 132, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #fde7f3;
+        }
+
+        tr:hover {
+            background: #fff0f8;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #ff5ca8, #c13584);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 0 3px;
+        }
+
+        .action-btn.approve {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
+        .action-btn.reject {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .action-btn.delete {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px;
+            color: #c13584;
+        }
+
+        @media (max-width:768px) {
+            .container {
+                padding: 20px;
+            }
+
+            nav {
+                padding: 0 20px;
+            }
+
+            .logo-img {
+                width: 120px;
+            }
+
+            .admin-badge {
+                display: none;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            td,
+            th {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <img src="logo.png" alt="TutorPoint" class="logo-img">
+        <div class="admin-info">
+            <span class="admin-badge"><i class="fas fa-user-shield"></i> Admin</span>
+            <a href="admin_home.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-envelope"></i> Contact Requests</h1>
+            <div class="filter-section">
+                <select class="filter-select" id="statusFilter" onchange="filterRequests()">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+        </div>
+        <div class="data-table" id="contactsTable">
+            <div class="empty-message"><i class="fas fa-spinner fa-spin"></i> Loading requests...</div>
+        </div>
+    </div>
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <h3><i class="fas fa-info-circle"></i> Request Details</h3>
+            <div id="modalDetails"></div>
+            <div style="display:flex; justify-content:flex-end; margin-top:20px;"><button class="action-btn"
+                    onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkUHxzVA6SxcTeheoytoWUAiuTKADWBQw",
+            authDomain: "medialert-a04d5.firebaseapp.com",
+            projectId: "medialert-a04d5",
+            storageBucket: "medialert-a04d5.firebasestorage.app",
+            messagingSenderId: "267657249954",
+            appId: "1:267657249954:web:01165929839cb83e7e03fb"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Admin check (localStorage based)
+        const userEmail = localStorage.getItem("userEmail");
+        const userType = localStorage.getItem("userType");
+        if (!userEmail || userEmail !== "tutorpointwebproject@gmail.com" || userType !== "admin") {
+            alert("Access denied! Admin only.");
+            window.location.href = "login.html";
+        }
+
+        let allRequests = [];
+
+        async function loadContactRequests() {
+            const tableDiv = document.getElementById("contactsTable");
+            tableDiv.innerHTML = '<div class="empty-message"><i class="fas fa-spinner fa-spin"></i> Loading requests...</div>';
+            try {
+                console.log("Fetching teacherContactRequests...");
+                const snapshot = await getDocs(collection(db, "teacherContactRequests"));
+                console.log("Snapshot size:", snapshot.size);
+                if (snapshot.empty) {
+                    tableDiv.innerHTML = '<div class="empty-message"><i class="fas fa-inbox"></i><p>No contact requests found.</p><p>Make sure you have submitted some from find_tutor.html</p></div>';
+                    return;
+                }
+                allRequests = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    console.log("Document data:", data);
+                    allRequests.push({ id: doc.id, ...data, createdAtDate: data.createdAt ? data.createdAt.toDate() : new Date(0) });
+                });
+                allRequests.sort((a, b) => b.createdAtDate - a.createdAtDate);
+                renderRequests('all');
+            } catch (error) {
+                console.error("Firestore read error:", error);
+                tableDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}<br>Check security rules and console.</div>`;
+            }
+        }
+
+        function renderRequests(status) {
+            let filtered = status === 'all' ? allRequests : allRequests.filter(r => r.status === status);
+            const tableDiv = document.getElementById("contactsTable");
+            if (filtered.length === 0) {
+                tableDiv.innerHTML = '<div class="empty-message"><i class="fas fa-inbox"></i><p>No requests with this status.</p></div>';
+                return;
+            }
+            let html = `<table><thead><tr><th>Student</th><th>Tutor</th><th>Area</th><th>Phone</th><th>Details</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+            filtered.forEach(r => {
+                const date = r.createdAtDate ? r.createdAtDate.toLocaleDateString() : 'N/A';
+                const shortDetails = r.details ? (r.details.length > 40 ? r.details.substring(0, 40) + '...' : r.details) : 'N/A';
+                html += `<tr><td>${escapeHtml(r.studentName || 'N/A')}</td><td>${escapeHtml(r.tutorName || 'N/A')}</td><td>${escapeHtml(r.area || 'N/A')}</td><td>${escapeHtml(r.phone || 'N/A')}</td><td>${escapeHtml(shortDetails)}</td><td>${date}</td><td><span class="status-badge status-${r.status || 'pending'}">${r.status || 'pending'}</span></td>
+            <td><button class="action-btn" onclick="viewRequest('${r.id}')"><i class="fas fa-eye"></i></button>
+            <button class="action-btn approve" onclick="updateStatus('${r.id}', 'approved')"><i class="fas fa-check"></i></button>
+            <button class="action-btn reject" onclick="updateStatus('${r.id}', 'rejected')"><i class="fas fa-times"></i></button>
+            <button class="action-btn delete" onclick="deleteRequest('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        }
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        window.filterRequests = function () { renderRequests(document.getElementById('statusFilter').value); };
+        window.viewRequest = function (id) { const req = allRequests.find(r => r.id === id); if (req) { document.getElementById('modalDetails').innerHTML = `<p><strong>Student:</strong> ${escapeHtml(req.studentName)}</p><p><strong>Tutor:</strong> ${escapeHtml(req.tutorName)}</p><p><strong>Area:</strong> ${escapeHtml(req.area)}</p><p><strong>Phone:</strong> ${escapeHtml(req.phone)}</p><p><strong>Details:</strong> ${escapeHtml(req.details)}</p><p><strong>Date:</strong> ${req.createdAtDate ? req.createdAtDate.toLocaleString() : 'N/A'}</p><p><strong>Status:</strong> <span class="status-badge status-${req.status}">${req.status}</span></p>`; document.getElementById('detailsModal').style.display = 'flex'; } };
+        window.updateStatus = async function (id, newStatus) { try { await updateDoc(doc(db, "teacherContactRequests", id), { status: newStatus, updatedAt: serverTimestamp() }); alert(`✅ Request ${newStatus}!`); loadContactRequests(); } catch (e) { alert("Error: " + e.message); } };
+        window.deleteRequest = async function (id) { if (confirm("Delete permanently?")) { try { await deleteDoc(doc(db, "teacherContactRequests", id)); alert("✅ Deleted."); loadContactRequests(); } catch (e) { alert("Error: " + e.message); } } };
+        window.closeModal = function () { document.getElementById('detailsModal').style.display = 'none'; };
+        window.refreshData = function () { loadContactRequests(); };
+        window.logout = function () { localStorage.clear(); window.location.href = "login.html"; };
+        window.onclick = function (e) { if (e.target === document.getElementById('detailsModal')) closeModal(); };
+        loadContactRequests();
+    </script>
+</body>
+
+</html>

@@ -419,6 +419,7 @@
         console.log("Firebase initialized successfully");
 
         const DEFAULT_PROFILE_IMG = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+        const ADMIN_EMAIL = "tutorpointwebproject@gmail.com";
 
         // Phone number validation function for Bangladesh
         function validateBangladeshPhone(phone) {
@@ -438,13 +439,11 @@
         document.getElementById('imageInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
-                // Check file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     alert("File size too large! Please select an image under 5MB.");
                     return;
                 }
                 
-                // Check file type
                 if (!file.type.startsWith('image/')) {
                     alert("Please select an image file.");
                     return;
@@ -486,6 +485,15 @@
             e.preventDefault();
             
             console.log("Form submitted - Starting registration process");
+
+            // Check if trying to create admin account
+            const email = document.getElementById('regEmail').value.toLowerCase().trim();
+            
+            if (email === ADMIN_EMAIL) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert("❌ Please use a different email address.");
+                return;
+            }
 
             // Show loading overlay
             document.getElementById('loadingOverlay').style.display = 'flex';
